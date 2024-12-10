@@ -406,6 +406,18 @@ var UnitItemControl = {
 	},
 	
 	setItem: function(unit, index, item) {
+		if (unit === null || typeof unit === 'undefined') {
+			return;
+		}
+		
+		if (typeof item === 'undefined') {
+			return;
+		}
+		
+		if (index < 0) {
+			return;
+		}
+		
 		unit.setItem(index, item);
 	},
 	

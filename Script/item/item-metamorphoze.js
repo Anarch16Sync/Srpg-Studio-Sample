@@ -62,6 +62,10 @@ var MetamorphozeItemUse = defineObject(BaseItemUse,
 		return this._dynamicEvent.moveDynamicEvent();
 	},
 	
+	validateItem: function(itemTargetInfo) {
+		return true;
+	},
+	
 	_checkItemLimit: function() {
 		var i, itemSrc;
 		var itemTargetInfo = this._itemUseParent.getItemTargetInfo();

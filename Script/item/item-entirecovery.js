@@ -44,6 +44,10 @@ var EntireRecoveryItemUse = defineObject(BaseItemUse,
 		return createPos(x, y);
 	},
 	
+	validateItem: function(itemTargetInfo) {
+		return true;
+	},
+	
 	_recoveryHp: function(unit) {
 		var hp = unit.getHp();
 		var maxMhp = ParamBonus.getMhp(unit);

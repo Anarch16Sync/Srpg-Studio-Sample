@@ -127,6 +127,10 @@ var BaseItemSentence = defineObject(BaseObject,
 	
 	getItemSentenceCount: function(item) {
 		return 0;
+	},
+	
+	_getMiddleSpace: function() {
+		return 42;
 	}
 }
 );
@@ -143,7 +147,7 @@ ItemSentence.AttackAndHit = defineObject(BaseItemSentence,
 		x += ItemInfoRenderer.getSpaceX();
 		NumberRenderer.drawRightNumber(x, y, item.getPow());
 		
-		x += 42;
+		x += this._getMiddleSpace();
 		
 		text = root.queryCommand('hit_capacity');
 		ItemInfoRenderer.drawKeyword(x, y, text);
@@ -167,7 +171,7 @@ ItemSentence.CriticalAndRange = defineObject(BaseItemSentence,
 		x += ItemInfoRenderer.getSpaceX();
 		NumberRenderer.drawRightNumber(x, y, item.getCritical());
 		
-		x += 42;
+		x += this._getMiddleSpace();
 		
 		text = root.queryCommand('range_capacity');
 		ItemInfoRenderer.drawKeyword(x, y, text);
@@ -210,7 +214,7 @@ ItemSentence.WeaponLevelAndWeight = defineObject(BaseItemSentence,
 			x += ItemInfoRenderer.getSpaceX();
 			NumberRenderer.drawRightNumber(x, y, item.getWeaponLevel());
 			
-			x += 42;
+			x += this._getMiddleSpace();
 		}
 		
 		if (this._isWeightDisplayable(item)) {

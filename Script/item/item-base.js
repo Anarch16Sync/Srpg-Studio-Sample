@@ -344,6 +344,18 @@ var BaseItemUse = defineObject(BaseObject,
 		}
 		
 		return pos;
+	},
+	
+	// 登場していないターゲットにアイテムは使用できない。
+	// イベントコマンドの「アイテムの使用」を使用する際に、未登場ターゲットを指定した場合の対策を行う。
+	validateItem: function(itemTargetInfo) {
+		if (itemTargetInfo.item !== null && itemTargetInfo.item.getItemType() === ItemType.CUSTOM) {
+			// カスタムアイテムがターゲットを必要とするかは分からないため、無条件に使用可能とみなす
+			return true;
+		}
+		
+		// この時点で事前チェックすることで、多くのアイテムのenterMainUseCycleでターゲット検証が不要になる
+		return itemTargetInfo.targetUnit !== null;
 	}
 }
 );
@@ -616,6 +628,10 @@ var ItemMainFlowEntry = defineObject(BaseFlowEntry,
 	_completeMemberData: function(itemUseParent) {
 		var animeData = itemUseParent.getItemTargetInfo().item.getItemAnime();
 		var pos = itemUseParent.getItemUseObject().getItemAnimePos(itemUseParent, animeData);
+		
+		if (!itemUseParent.getItemUseObject().validateItem(itemUseParent.getItemTargetInfo())) {
+			return EnterResult.NOTENTER;
+		}
 		
 		if (pos === null || itemUseParent.isItemSkipMode()) {
 			return this._changeMainUse() ? EnterResult.OK : EnterResult.NOTENTER;

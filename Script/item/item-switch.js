@@ -44,6 +44,10 @@ var SwitchItemInfo = defineObject(BaseItemInfo,
 	
 	getInfoPartsCount: function() {
 		return 1;
+	},
+	
+	validateItem: function(itemTargetInfo) {
+		return true;
 	}
 }
 );

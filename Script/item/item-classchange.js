@@ -81,6 +81,10 @@ var ClassChangeItemUse = defineObject(BaseItemUse,
 		}
 	},
 	
+	validateItem: function(itemTargetInfo) {
+		return true;
+	},
+	
 	_isChangeAllowed: function(itemTargetInfo) {
 		if (itemTargetInfo.targetClass === null) {
 			return false;

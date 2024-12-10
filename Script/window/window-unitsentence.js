@@ -101,7 +101,7 @@ var BaseUnitSentence = defineObject(BaseObject,
 		
 		TextRenderer.drawKeywordText(x, y, text, length, color, font);
 		
-		x += 78;
+		x += this._getNumberSpace();
 		
 		if (isValid) {
 			if (value < 0) {
@@ -121,6 +121,10 @@ var BaseUnitSentence = defineObject(BaseObject,
 	
 	getUnitSentenceTextUI: function() {
 		return root.queryTextUI('default_window');
+	},
+	
+	_getNumberSpace: function() {
+		return 78;
 	}
 }
 );
@@ -243,7 +247,7 @@ UnitSentence.Range = defineObject(BaseUnitSentence,
 		var alpha = 255;
 		
 		TextRenderer.drawKeywordText(x, y, root.queryCommand('range_capacity'), length, color, font);
-		x += 78;
+		x += this._getNumberSpace();
 		
 		if (weapon === null) {
 			TextRenderer.drawSignText(x - 5, y, StringTable.SignWord_Limitless);

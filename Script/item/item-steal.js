@@ -92,6 +92,10 @@ var StealItemUse = defineObject(BaseItemUse,
 		return this.getUnitBasePos(itemUseParent, animeData);
 	},
 	
+	validateItem: function(itemTargetInfo) {
+		return itemTargetInfo.targetUnit !== null && itemTargetInfo.targetItem !== null;
+	},
+	
 	_isImmediately: function() {
 		// If targetItem has already been set, it can steal it immediately without displaying a trade screen.
 		return this._itemUseParent.getItemTargetInfo().targetItem !== null;

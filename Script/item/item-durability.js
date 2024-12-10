@@ -130,6 +130,10 @@ var DurabilityChangeItemUse = defineObject(BaseItemUse,
 		return this.getUnitBasePos(itemUseParent, animeData);
 	},
 	
+	validateItem: function(itemTargetInfo) {
+		return itemTargetInfo.targetUnit !== null && itemTargetInfo.targetItem !== null;
+	},
+	
 	_getDurability: function(itemTargetInfo) {
 		var durability = -1;
 		var type = itemTargetInfo.item.getDurabilityInfo().getDurabilityChangeType();

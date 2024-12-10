@@ -119,6 +119,10 @@ var KeyItemUse = defineObject(BaseItemUse,
 		return LayoutControl.getMapAnimationPos(x, y, animeData);
 	},
 	
+	validateItem: function(itemTargetInfo) {
+		return true;
+	},
+	
 	_getEvent: function() {
 		var itemTargetInfo = this._itemUseParent.getItemTargetInfo();
 		var targetPos = itemTargetInfo.targetPos;

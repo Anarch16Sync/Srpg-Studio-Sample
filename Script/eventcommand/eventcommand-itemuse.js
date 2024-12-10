@@ -65,7 +65,7 @@ var ItemUseEventCommand = defineObject(BaseEventCommand,
 		this._item = UnitItemControl.getMatchItem(this._unit, eventCommandData.getUseItem());
 		this._targetUnit = eventCommandData.getTargetUnit();
 		this._targetPos = createPos(eventCommandData.getTargetX(), eventCommandData.getTargetY());
-		this._targetItem = eventCommandData.getTargetItem();
+		this._targetItem = UnitItemControl.getMatchItem(this._targetUnit, eventCommandData.getTargetItem());
 		this._targetClass = null;
 		this._targetMetamorphoze = null;
 		

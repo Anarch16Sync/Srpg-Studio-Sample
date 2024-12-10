@@ -218,6 +218,10 @@ var RealBattle = defineObject(BaseBattle,
 		return this._battlerLeft;
 	},
 	
+	getUIBattleLayout: function() {
+		return this._uiBattleLayout;
+	},
+	
 	_prepareBattleMemberData: function(coreAttack) {
 		this._parentCoreAttack = coreAttack;
 		this._attackFlow = this._parentCoreAttack.getAttackFlow();
@@ -1813,6 +1817,10 @@ var UIBattleLayout = defineObject(BaseObject,
 	_drawBackground: function(xScroll, yScroll) {
 		var pic;
 		
+		if (this._isBackgroundDisabled()) {
+			return;
+		}
+		
 		if (this._scrollBackground.isScrollable()) {
 			this._scrollBackground.drawScrollBackground();
 		}
@@ -2226,19 +2234,64 @@ var UIBattleLayout = defineObject(BaseObject,
 	},
 	
 	_createBattleContainer: function(realBattle) {
+		this._battleContainer = this._createBattleContainerInternal(realBattle);
+		this._battleContainer.setBattleObject(realBattle);
+	},
+	
+	_createBattleContainerInternal: function(realBattle) {
+		var battleContainer;
+		
 		if (DataConfig.isHighResolution()) {
 			if (EnvironmentControl.isRealBattleScaling()) {
-				this._battleContainer = createObject(ScalingBattleContainer);
+				if (this._isFullFixedFocus()) {
+					battleContainer = createObject(FixedFocusBattleContainer);
+				}
+				else {
+					battleContainer = createObject(ScalingBattleContainer);
+				}
 			}
 			else {
-				this._battleContainer = createObject(ClipingBattleContainer);
+				battleContainer = createObject(ClipingBattleContainer);
 			}
 		}
 		else {
-			this._battleContainer = createObject(BaseBattleContainer);
+			battleContainer = createObject(BaseBattleContainer);
 		}
 		
-		this._battleContainer.setBattleObject(realBattle);
+		return battleContainer;
+	},
+	
+	_isFullFixedFocus: function(realBattle) {
+		var preference = root.getAnimePreference();
+		
+		// When "Do not scroll in battle" is enabled and the boundary lines are close together, allows enlargement with the aspect ratio maintained.
+		// This functionality will improve the appearance when the screen resolution is 16:9 (1280x720, etc).
+		// If the boundary lines are changed from 192 to 292, large motions like Hydra will fit in the battle layout.
+		// Normally, the enemy cannot be seen until the player has scrolled and approached,
+		// but by adjusting the boundary lines the enemy can be seen without scrolling.
+		return preference.isFixedFocus() && preference.getBoundaryWidth() >= 192 + 100;
+	},
+	
+	_drawBackgroundFixedFocus: function() {
+		var pic;
+		
+		if (this._scrollBackground.isScrollable()) {
+			this._scrollBackground.drawScrollBackground();
+		}
+		else {
+			pic = this._getBackgroundImage();
+			if (pic !== null) {
+				// By specifying root.getGameAreaWidth(Height), the background image can be displayed on the whole game screen.
+				pic.drawStretchParts(0, 0, root.getGameAreaWidth(), root.getGameAreaHeight(), 0, 0, pic.getWidth(), pic.getHeight());
+			}
+			else {
+				root.getGraphicsManager().fill(0x0);
+			}
+		}
+	},
+	
+	_isBackgroundDisabled: function() {
+		return typeof this._disabledBackground !== 'undefined';
 	}
 }
 );
@@ -2385,6 +2438,95 @@ var ScalingBattleContainer = defineObject(BaseBattleContainer,
 		// so disable to draw a map and the unit.
 		root.getCurrentSession().setMapState(MapStateType.DRAWUNIT, isEnabled);
 		root.getCurrentSession().setMapState(MapStateType.DRAWMAP, isEnabled);
+	}
+}
+);
+
+// This object is prepared in order to display the battle layout correctly even in 16:9 resolution.
+// When using this object, there will be gaps on either side of the screen since the battle layout
+// written in the cache is enlarged while maintaining the original aspect ratio.
+// In order to fill those gaps the background is drawn before the battle layout rather than inside of it.
+// In other words, the background image and battle layout are drawn separately.
+// This method has the benefit of looking good since the background is not enlarged, 
+// but only if there is a battle background of the same screen resolution.
+// For example, if both the screen resolution and the battle background are 1280x720, then the background won't be enlarged.
+// Since this object displays the whole background on the screen, there is no concept of scrolling.
+// As such, this object won't be used when "Do not scroll in battle" is disabled.
+var FixedFocusBattleContainer = defineObject(BaseBattleContainer,
+{
+	_picCache: null,
+	
+	startBattleContainer: function() {
+		this._picCache = root.getGraphicsManager().createCacheGraphics(this._getSurfaceWidth(), this._getSurfaceHeight());
+		root.getVideoManager().emulateFullScreen(true);
+	},
+	
+	pushBattleContainer: function() {
+		// Draw the background on the whole screen beforehand.
+		this._advanceBackgroundDrawing();
+		
+		root.getGraphicsManager().enableMapClipping(false);
+		
+		root.getGraphicsManager().setRenderCache(this._picCache);
+		
+		// Since the background is already drawn, there is no need to draw it within the battle layout.
+		this._changeBackgroundFlag(true);
+	},
+	
+	popBattleContainer: function() {
+		var x = Math.floor(root.getGameAreaWidth() - this._getSurfaceWidth()) / 2;
+		var y = Math.floor(root.getGameAreaHeight() - this._getSurfaceHeight()) / 2;
+
+		root.getGraphicsManager().resetRenderCache();
+		this._picCache.drawStretchParts(x, y, this._getSurfaceWidth(), this._getSurfaceHeight(), 0, 0, this._getBattleAreaWidth(), this._getBattleAreaHeight());
+		
+		root.getGraphicsManager().enableMapClipping(true);
+		
+		this._changeBackgroundFlag(false);
+	},
+	
+	endBattleContainer: function() {
+		root.getVideoManager().emulateFullScreen(false);
+	},
+	
+	_getSurfaceWidth: function() {
+		// RealBattleArea.WIDTH is assumed to be unchanged.
+		return Math.floor(640 * this._getScalingRate());
+	},
+	
+	_getSurfaceHeight: function() {
+		return Math.floor(480 * this._getScalingRate());
+	},
+	
+	_getScalingRate: function() {
+		var resolutionIndex = root.getConfigInfo().getResolutionIndex();
+		var rate = 1.5;
+		
+		// These are scaling rates at 4:3 resolution.
+		if (resolutionIndex === 0) {
+			rate = 1.0;
+		}
+		else if (resolutionIndex === 1) {
+			rate = 1.25;
+		}
+		else if (resolutionIndex === 2) {
+			rate = 1.6;
+		}
+		
+		return rate;
+	},
+	
+	_advanceBackgroundDrawing: function() {
+		AttackControl.getBattleObject().getUIBattleLayout()._drawBackgroundFixedFocus();
+	},
+	
+	_changeBackgroundFlag: function(isBoolean) {
+		if (isBoolean) {
+			AttackControl.getBattleObject().getUIBattleLayout()._disabledBackground = true;
+		}
+		else {
+			delete AttackControl.getBattleObject().getUIBattleLayout()._disabledBackground;
+		}
 	}
 }
 );

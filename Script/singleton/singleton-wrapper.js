@@ -676,5 +676,27 @@ var MediaControl = {
 		
 		// Release the background music data which exists in the memory.
 		root.getMediaManager().clearMusicCache();
+	},
+	
+	getCurrentMusicTime: function() {
+		var time = root.getMediaManager().getActiveMusicTime();
+		
+		// var minutes = Math.floor(time / 60000);
+		// var seconds = Math.floor((time % 60000) / 1000);
+		// var milliseconds = time % 1000;
+		// root.resetConsole();
+		// root.log(minutes + ' : ' + seconds + ' : ' + milliseconds);
+		
+		return time;
+	},
+	
+	setCurrentMusicTime: function(minutes, seconds, milliseconds) {
+		var time = 0;
+		
+		time += minutes * 60 * 1000;
+		time += seconds * 1000;
+		time += milliseconds;
+		
+		root.getMediaManager().setActiveMusicTime(time);
 	}
 };

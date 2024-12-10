@@ -281,7 +281,7 @@ var TitleScreenScrollbar = defineObject(BaseScrollbar,
 	},
 	
 	getObjectWidth: function() {
-		return 220;
+		return (this._getTitlePartsCount() + 2) * TitleRenderer.getTitlePartsWidth();
 	},
 	
 	getObjectHeight: function() {

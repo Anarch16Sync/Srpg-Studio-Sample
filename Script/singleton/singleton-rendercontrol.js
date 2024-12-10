@@ -345,7 +345,7 @@ var UnitSimpleRenderer = {
 		var font = textui.getFont();
 		
 		x += GraphicsFormat.FACE_WIDTH + this._getInterval();
-		y += 10;
+		y += this._getVerticalPositionArray()[0];
 		TextRenderer.drawText(x, y, unit.getName(), length, color, font);
 	},
 	
@@ -355,7 +355,7 @@ var UnitSimpleRenderer = {
 		var font = textui.getFont();
 		
 		x += GraphicsFormat.FACE_WIDTH + this._getInterval();
-		y += 40;
+		y += this._getVerticalPositionArray()[1];
 		TextRenderer.drawText(x, y, unit.getClass().getName(), length, color, font);
 	},
 	
@@ -363,7 +363,7 @@ var UnitSimpleRenderer = {
 		var pic = root.queryUI('unit_gauge');
 		
 		x += GraphicsFormat.FACE_WIDTH + this._getInterval();
-		y += 60;
+		y += this._getVerticalPositionArray()[2];
 		ContentRenderer.drawUnitHpZoneEx(x, y, unit, pic, mhp);
 	},
 	
@@ -373,6 +373,10 @@ var UnitSimpleRenderer = {
 	
 	_getInterval: function() {
 		return 10;
+	},
+	
+	_getVerticalPositionArray: function() {
+		return [10, 40, 60];
 	}
 };
 
@@ -786,7 +790,7 @@ var ContentRenderer = {
 	drawLevelInfo: function(x, y, unit) {
 		var textLv = StringTable.Status_Level;
 		var textExp = StringTable.Status_Experience;
-		var dx = [0, 44, 60, 98];
+		var dx = this._getHorizontalSpaceArray();
 		var exp = unit.getExp();
 		
 		// If the unit is the enemy, check if "Get optional exp of class when enemy is killed" is set at the game option.
@@ -806,7 +810,7 @@ var ContentRenderer = {
 	drawHp: function(x, y, hp, maxHp) {
 		var textHp = this._getHpText();
 		var textSlash = '/';
-		var dx = [0, 44, 60, 98];
+		var dx = this._getHorizontalSpaceArray();
 		
 		TextRenderer.drawSignText(x + dx[0], y, textHp);
 		NumberRenderer.drawNumber(x + dx[1], y, hp);
@@ -820,11 +824,11 @@ var ContentRenderer = {
 	
 	drawUnitHpZoneEx: function(x, y, unit, pic, mhp) {
 		var hp = unit.getHp();
+		var obj = this._getGaugePositionAndWidth();
 		
 		this.drawHp(x, y, hp, mhp);
 		
-		y += 20;
-		this.drawGauge(x, y, hp, mhp, 1, 110, pic);
+		this.drawGauge(x, y + obj.y, hp, mhp, 1, obj.width, pic);
 	},
 	
 	drawPlayTime: function(x, y, time) {
@@ -944,6 +948,14 @@ var ContentRenderer = {
 	
 	_getHpText: function() {
 		return root.queryCommand('hp_param');
+	},
+	
+	_getHorizontalSpaceArray: function() {
+		return [0, 44, 60, 98];
+	},
+	
+	_getGaugePositionAndWidth: function() {
+		return {y: 20, width: 110};
 	}
 };
 

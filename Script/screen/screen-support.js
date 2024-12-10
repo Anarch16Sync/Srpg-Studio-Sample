@@ -611,7 +611,7 @@ var SupportSenderWindow = defineObject(BaseWindow,
 );
 
 var SupportSenderScrollbar = defineObject(BaseScrollbar,
-{	
+{
 	drawScrollContent: function(x, y, object, isSelect, index) {
 		var length = this._getTextLength() - 40;
 		var textui = this.getParentTextUI();
@@ -629,8 +629,8 @@ var SupportSenderScrollbar = defineObject(BaseScrollbar,
 		
 		unitRenderParam.alpha = alpha;
 		UnitRenderer.drawDefaultUnit(unit, x + 10, y + 10, unitRenderParam);
-		y += 20;
 		x += 60;
+		y += 20;
 		
 		TextRenderer.drawKeywordText(x, y, name, length, color, font);
 	},
