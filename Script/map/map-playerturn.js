@@ -1006,10 +1006,14 @@ var ReactionFlowEntry = defineObject(BaseFlowEntry,
 	_startReactionAnime: function() {
 		var x = LayoutControl.getPixelX(this._targetUnit.getMapX());
 		var y = LayoutControl.getPixelY(this._targetUnit.getMapY());
-		var anime = root.queryAnime('reaction');
+		var anime = this._getReactionAnime();
 		var pos = LayoutControl.getMapAnimationPos(x, y, anime);
 		
 		this._dynamicAnime.startDynamicAnime(anime, pos.x, pos.y, anime);
+	},
+	
+	_getReactionAnime: function() {
+		return root.queryAnime('reaction');
 	}
 }
 );

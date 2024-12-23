@@ -279,6 +279,9 @@ var UnitDeclarationFlowEntry = defineObject(BaseFlowEntry,
 		var order = coreAttack.getAttackFlow().getAttackOrder();
 		var battleEventData = UnitEventChecker.getUnitBattleEventData(order.getActiveUnit(), order.getPassiveUnit());
 		
+		// "Attacker" and "Defender" can be referenced from variables.
+		root.getSceneController().notifyBattleStart(order.getActiveUnit(), order.getPassiveUnit());
+		
 		if (battleEventData === null) {
 			return EnterResult.NOTENTER;
 		}
@@ -288,9 +291,6 @@ var UnitDeclarationFlowEntry = defineObject(BaseFlowEntry,
 		if (this.isFlowSkip() || coreAttack.isBattleCut()) {
 			root.setEventSkipMode(true);
 		}
-		
-		// "Attacker" and "Defender" can be referenced from variables.
-		root.getSceneController().notifyBattleStart(order.getActiveUnit(), order.getPassiveUnit());
 		
 		return this._capsuleEvent.enterCapsuleEvent(battleEventData.event, true);
 	}

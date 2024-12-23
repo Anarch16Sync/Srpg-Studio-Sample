@@ -136,14 +136,14 @@ var ExtraScrollbar = defineObject(BaseScrollbar,
 		var font = textui.getFont();
 		var pic = textui.getUIImage();
 		
-		TextRenderer.drawFixedTitleText(x, y, text, color, font, TextFormat.CENTER, pic, this._getCount());
+		TextRenderer.drawFixedTitleText(x, y, text, color, font, TextFormat.CENTER, pic, this._getTitlePartsCount());
 	},
 	
 	drawDescriptionLine: function(x, y) {
 	},
 	
 	getObjectWidth: function() {
-		return (this._getCount() + 2) * TitleRenderer.getTitlePartsWidth();
+		return (this._getTitlePartsCount() + 2) * TitleRenderer.getTitlePartsWidth();
 	},
 	
 	getObjectHeight: function() {
@@ -154,7 +154,7 @@ var ExtraScrollbar = defineObject(BaseScrollbar,
 		return root.queryTextUI('extraitem_title');
 	},
 	
-	_getCount: function() {
+	_getTitlePartsCount: function() {
 		return 6;
 	}
 }

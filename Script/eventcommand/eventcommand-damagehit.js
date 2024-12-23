@@ -376,6 +376,7 @@ var DamageLastFlowEntry = defineObject(BaseFlowEntry,
 		
 		this._damageHitFlow = createObject(DamageHitFlow);
 		if (this._damageHitFlow.enterDamageHitFlowCycle(this._damageData.launchUnit, this._damageData.targetUnit) === EnterResult.NOTENTER) {
+			this._doEndAction();
 			return EnterResult.NOTENTER;
 		}
 		
@@ -391,6 +392,12 @@ var DamageLastFlowEntry = defineObject(BaseFlowEntry,
 	
 	drawFlowEntry: function() {
 		this._damageHitFlow.drawDamageHitFlowCycle();
+	},
+	
+	_doEndAction: function() {
+		if (root.getChainEvent(0) === null) {
+			CurrentMap.setTurnSkipMode(false);
+		}
 	}
 }
 );

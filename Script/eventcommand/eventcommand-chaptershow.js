@@ -159,7 +159,7 @@ var ChapterShowEventCommand = defineObject(BaseEventCommand,
 		width = TextRenderer.getTextWidth(title, font);
 		x = LayoutControl.getCenterX(-1, width);
 		
-		TextRenderer.drawText(x, pos.y + 10, title, -1, color, font);
+		TextRenderer.drawText(x, pos.y + this._getVerticalPositionArray()[0], title, -1, color, font);
 	},
 	
 	_drawSecond: function() {
@@ -171,7 +171,7 @@ var ChapterShowEventCommand = defineObject(BaseEventCommand,
 		
 		width = TextRenderer.getTextWidth(this._chapterName, font);
 		x = LayoutControl.getCenterX(-1, width);
-		TextRenderer.drawText(x, pos.y + 38, this._chapterName, -1, color, font);
+		TextRenderer.drawText(x, pos.y + this._getVerticalPositionArray()[1], this._chapterName, -1, color, font);
 	},
 	
 	_drawThird: function() {
@@ -190,7 +190,11 @@ var ChapterShowEventCommand = defineObject(BaseEventCommand,
 		width = TextRenderer.getTextWidth(title, font);
 		x = LayoutControl.getCenterX(-1, width);
 		
-		TextRenderer.drawText(x, pos.y + 70, title, -1, color, font);
+		TextRenderer.drawText(x, pos.y + this._getVerticalPositionArray()[2], title, -1, color, font);
+	},
+	
+	_getVerticalPositionArray: function() {
+		return [10, 38, 70];
 	},
 	
 	_getTextUI: function() {

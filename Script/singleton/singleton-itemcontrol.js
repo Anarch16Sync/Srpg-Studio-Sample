@@ -410,15 +410,17 @@ var UnitItemControl = {
 			return;
 		}
 		
-		if (typeof item === 'undefined') {
-			return;
-		}
-		
 		if (index < 0) {
 			return;
 		}
 		
-		unit.setItem(index, item);
+		if (item === null || typeof item === 'undefined') {
+			unit.clearItem(index);
+		}
+		else {
+			// Avoid specifying null for script APIs whenever possible.
+			unit.setItem(index, item);
+		}
 	},
 	
 	cutItem: function(unit, index) {

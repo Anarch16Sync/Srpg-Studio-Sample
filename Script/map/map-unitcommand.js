@@ -1093,10 +1093,14 @@ UnitCommand.Quick = defineObject(UnitListCommand,
 	_showAnime: function(unit) {
 		var x = LayoutControl.getPixelX(unit.getMapX());
 		var y = LayoutControl.getPixelY(unit.getMapY());
-		var anime = root.queryAnime('quick');
+		var anime = this._getQuickAnime(unit);
 		var pos = LayoutControl.getMapAnimationPos(x, y, anime);
 		
 		this._dynamicAnime.startDynamicAnime(anime, pos.x, pos.y);
+	},
+	
+	_getQuickAnime: function(unit) {
+		return root.queryAnime('quick');
 	}
 }
 );

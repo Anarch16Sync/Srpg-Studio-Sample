@@ -526,7 +526,7 @@ var BaseQuestSentence = defineObject(BaseObject,
 		
 		y += 19;
 		TextRenderer.drawKeywordText(x + 8, y + 0, text, -1, color, font);
-		NumberRenderer.drawNumberColor(x + 186, y + 0, number, colorIndex, 255);
+		NumberRenderer.drawNumberColor(x + this._getNumberSpace(), y + 0, number, colorIndex, 255);
 	},
 	
 	_drawTitle: function(x, y) {
@@ -544,6 +544,10 @@ var BaseQuestSentence = defineObject(BaseObject,
 	
 	_getNumberColorIndex: function() {
 		return 3;
+	},
+	
+	_getNumberSpace: function() {
+		return 186;
 	}
 }
 );
@@ -665,7 +669,7 @@ QuestSentence.Reward = defineObject(BaseQuestSentence,
 		this._drawTitle(x, y);
 		y += 10;
 		ItemRenderer.drawItem(x + 8, y + 8, reward.getItem(), color, font, false);
-		TextRenderer.drawKeywordText(x + 168, y - 3, StringTable.Quest_GetItem, -1, ColorValue.KEYWORD, font);
+		TextRenderer.drawKeywordText(x + this._getKeywordSpace(), y - 3, StringTable.Quest_GetItem, -1, ColorValue.KEYWORD, font);
 	},
 	
 	_drawGold: function(x, y, reward) {
@@ -685,6 +689,10 @@ QuestSentence.Reward = defineObject(BaseQuestSentence,
 	
 	_getNumberColorInex: function() {
 		return 1;
+	},
+	
+	_getKeywordSpace: function() {
+		return 168;
 	},
 	
 	_isRewardEnabled: function(reward) {

@@ -263,11 +263,15 @@ var DurabilityChangeNoticeView = defineObject(BaseNoticeView,
 	_drawLimit: function(x, y) {
 		var balancer = this._balancer;
 		var textSlash = '/';
-		var dx = [44, 60, 98];
+		var dx = this._getHorizontalSpaceArray();
 		
 		NumberRenderer.drawNumberColor(x + dx[0], y, balancer.getCurrentValue(), 1, 255);
 		TextRenderer.drawSignText(x + dx[1], y, textSlash);
 		NumberRenderer.drawNumber(x + dx[2], y, balancer.getMaxValue());
+	},
+	
+	_getHorizontalSpaceArray: function() {
+		return [44, 60, 98];
 	},
 	
 	_playDurabilityChangeSound: function() {
