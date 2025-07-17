@@ -163,8 +163,16 @@ var ItemControl = {
 	// This method is called if changes occur in the item list.
 	// For example, item equipped, increase, trade, stock trade, weapon durability 0 etc.
 	updatePossessionItem: function(unit) {
-		var scene = root.getCurrentScene();
-		var mhp = ParamBonus.getMhp(unit);
+		var mhp, scene;
+		var curHp = unit.getHp();
+		
+		// An incapacitated unit's HP should not change.
+		if (!DataConfig.isBattleSetupRecoverable() && curHp === ChronicInjuryHp.ZERO) {
+			return;
+		}
+		
+		mhp = ParamBonus.getMhp(unit);
+		scene = root.getCurrentScene();
 		
 		// If scene is neither FREE nor EVENT, HP is always matched with maximum HP.
 		// If this processing is forgotten, HP changes with item trade or item increase/decrease.
@@ -173,10 +181,10 @@ var ItemControl = {
 		}
 		
 		// HP shouldn't exceed the maximum HP.
-		if (unit.getHp() > mhp) {
+		if (curHp > mhp) {
 			unit.setHp(mhp);
 		}
-		else if (unit.getHp() < 1) {
+		else if (curHp < 1) {
 			unit.setHp(1);
 		}
 	},
@@ -604,9 +612,9 @@ var StockItemControl = {
 		var itemArray = this.getStockItemArray();
 		
 		// Priority of sorting is as below.
-		// Weapon has more priority than the item,
-		// the item with low id has more priority than the high item,
-		// the item with a low durability has more priority than the high item.
+		// 1. Weapon has more priority than the item,
+		// 2. the item with low id has more priority than the high item,
+		// 3. the item with a low durability has more priority than the high item.
 		itemArray.sort(
 			function(item1, item2) {
 				var id1, id2;

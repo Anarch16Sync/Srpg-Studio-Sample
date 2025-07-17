@@ -1592,8 +1592,12 @@ DataVariable.Act = defineObject(BaseDataVariable,
 DataVariable.Pdb = defineObject(BaseDataVariable,
 {
 	getList: function() {
-		// This method can be called for games that change unit names.
-		// return root.getMetaSession().getTotalPlayerList();
+		// If the game dynamically changes the names of units with "Change Unit Info" or unit.setName() and uses the pdb control character,
+		// the following code is recommended.
+		// var sceneType = root.getCurrentScene();return sceneType === SceneType.TITLE || sceneType === SceneType.EVENTTEST ? root.getBaseData().getPlayerList() : root.getMetaSession().getTotalPlayerList();
+		
+		// However, getTotalPlayerList has the weakness that it cannot retrieve the names of members who have not yet joined the list.
+		// By default, the following code is used, assuming no dynamic renaming.
 		return root.getBaseData().getPlayerList();
 	},
 	

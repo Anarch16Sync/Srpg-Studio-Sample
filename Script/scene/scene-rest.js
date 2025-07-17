@@ -458,7 +458,7 @@ var RestNextFlowEntry = defineObject(BaseFlowEntry,
 );
 
 var RestCommand = defineObject(BaseListCommandManager,
-{	
+{
 	getPositionX: function() {
 		return LayoutControl.getRelativeX(8);
 	},
@@ -508,9 +508,15 @@ var RestCommand = defineObject(BaseListCommandManager,
 	},
 	
 	_isImageTalkDisplayable: function() {
-		var i;
-		var list = root.getCurrentSession().getTalkEventList();
-		var count = list.getCount();
+		var i, list, count;
+		var session = root.getCurrentSession();
+		
+		if (session === null) {
+			return false;
+		}
+		
+		list = session.getTalkEventList();
+		count = list.getCount();
 		
 		for (i = 0; i < count; i++) {
 			if (list.getData(i).isEvent()) {

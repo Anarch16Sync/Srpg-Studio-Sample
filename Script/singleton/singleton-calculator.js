@@ -840,13 +840,13 @@ var ExperienceCalculator = {
 		var factor = 100;
 		var option = root.getMetaSession().getDifficulty().getDifficultyOption();
 		
-		if (option & DifficultyFlag.GROWTH) {
-			factor = 200;
-		}
-		
 		skill = SkillControl.getBestPossessionSkill(unit, SkillType.GROWTH);
 		if (skill !== null) {
 			factor = skill.getSkillValue();
+		}
+		
+		if (option & DifficultyFlag.GROWTH) {
+			factor *= 2;
 		}
 		
 		return factor / 100;
@@ -974,7 +974,7 @@ var ExperienceControl = {
 			growthArray = this._createGrowthArray(unit);
 		}
 		else {
-			growthArray = unit.getClass().getPrototypeInfo().getGrowthArray(unit.getLv());
+			growthArray = this._createCusotmGrowthArray(unit);
 		}
 		
 		return growthArray;
@@ -1016,6 +1016,62 @@ var ExperienceControl = {
 		}
 		
 		return growthArray;
+	},
+	
+	_createCusotmGrowthArray: function(unit) {
+		var i, type, defIndex;
+		var count = ParamGroup.getParameterCount();
+		var customGrowthArray = [];
+		var defaultGrowthArray = unit.getClass().getPrototypeInfo().getGrowthArray(unit.getLv());
+		
+		for (i = 0; i < count; i++) {
+			type = ParamGroup.getParameterType(i);
+			
+			defIndex = -1;
+			
+			if (type === ParamType.MHP) {
+				defIndex = 0;
+			}
+			else if (type === ParamType.POW) {
+				defIndex = 1;
+			}
+			else if (type === ParamType.MAG) {
+				defIndex = 2;
+			}
+			else if (type === ParamType.SKI) {
+				defIndex = 3;
+			}
+			else if (type === ParamType.SPD) {
+				defIndex = 4;
+			}
+			else if (type === ParamType.LUK) {
+				defIndex = 5;
+			}
+			else if (type === ParamType.DEF) {
+				defIndex = 6;
+			}
+			else if (type === ParamType.MDF) {
+				defIndex = 7;
+			}	
+			else if (type === ParamType.MOV) {
+				defIndex = 8;
+			}
+			else if (type === ParamType.WLV) {
+				defIndex = 9;
+			}
+			else if (type === ParamType.BLD) {
+				defIndex = 10;
+			}
+
+			if (defIndex === -1) {
+				customGrowthArray[i] = 0;
+			}
+			else {
+				customGrowthArray[i] = defaultGrowthArray[defIndex];
+			}
+		}
+		
+		return customGrowthArray;
 	},
 	
 	_getGrowthValue: function(n) {

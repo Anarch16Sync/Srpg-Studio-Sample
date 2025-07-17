@@ -60,7 +60,7 @@ var UnitCommand = defineObject(BaseListCommandManager,
 			return false;
 		}
 		
-		// When it's unlimited action, move again doesn't occur.
+		// When it's "Infinite Actions", move again doesn't occur.
 		if (Miscellaneous.isPlayerFreeAction(unit)) {
 			return false;
 		}
@@ -1579,16 +1579,10 @@ UnitCommand.Attack = defineObject(UnitListCommand,
 	_prepareCommandMemberData: function() {
 		this._weaponSelectMenu = createObject(WeaponSelectMenu);
 		this._posSelector = createObject(PosSelector);
-		this._isWeaponSelectDisabled = false;
+		this._isWeaponSelectDisabled = this._checkWeaponSelectionDisabled();
 	},
 	
 	_completeCommandMemberData: function() {
-		if (DataConfig.isWeaponSelectSkippable()) {
-			if (this._getWeaponCount() === 1) {
-				this._isWeaponSelectDisabled = true;
-			}
-		}
-		
 		if (this._isWeaponSelectDisabled) {
 			this._startSelection(ItemControl.getEquippedWeapon(this.getCommandTarget()));
 		}
@@ -1597,6 +1591,17 @@ UnitCommand.Attack = defineObject(UnitListCommand,
 			this._weaponPrev = this._weaponSelectMenu.getSelectWeapon();
 			this.changeCycleMode(AttackCommandMode.TOP);
 		}
+	},
+	
+	_checkWeaponSelectionDisabled: function() {
+		var isDisabled = false;
+		
+		// If "Skip weapon select menu when only have 1 weapon" is enabled and there is only one equippable weapon, disable weapon selection.
+		if (DataConfig.isWeaponSelectSkippable() && this._getWeaponCount() === 1) {
+			isDisabled = true;
+		}
+		
+		return isDisabled;
 	},
 	
 	_getWeaponCount: function() {
@@ -2578,10 +2583,11 @@ UnitCommand.FusionAttack = defineObject(UnitCommand.Attack,
 	},
 	
 	_completeCommandMemberData: function() {
-		// When the status is shown with PosMenu before battle starts,
-		// correction of "Fusion Attack" should be added, so call it at this time.
-		FusionControl.startFusionAttack(this.getCommandTarget(), this._fusionData);
-		
+		if (!this._isWeaponSelectDisabled) {
+			// When the status is shown with PosMenu before battle starts,
+			// correction of "Fusion Attack" should be added, so call it at this time.
+			FusionControl.startFusionAttack(this.getCommandTarget(), this._fusionData);
+		}
 		UnitCommand.Attack._completeCommandMemberData.call(this);
 	},
 	
@@ -2589,7 +2595,32 @@ UnitCommand.FusionAttack = defineObject(UnitCommand.Attack,
 		var result = UnitCommand.Attack._moveTop.call(this);
 		
 		if (result !== MoveResult.CONTINUE) {
-			FusionControl.endFusionAttack(this.getCommandTarget());
+			if (!this._isWeaponSelectDisabled) {
+				FusionControl.endFusionAttack(this.getCommandTarget());
+			}
+		}
+		
+		return result;
+	},
+	
+	_startSelection: function(weapon) {
+		if (this._isWeaponSelectDisabled) {
+			// If "Skip weapon select menu when only have 1 weapon" is enabled, the startFusionAttack method is called in the _startSelection.
+			FusionControl.startFusionAttack(this.getCommandTarget(), this._fusionData);
+		}
+		
+		UnitCommand.Attack._startSelection.call(this, weapon);
+	},
+	
+	_moveSelection: function() {
+		var result = UnitCommand.Attack._moveSelection.call(this);
+		
+		if (result !== MoveResult.CONTINUE) {
+			if (this._isWeaponSelectDisabled) {
+				// There may be cases where the "Fusion Attack" command is selected, but then canceled and the regular "Attack" command is selected.
+				// Assuming this case, clear the fusion data with the endFusionAttack method so that it does not remain.
+				FusionControl.endFusionAttack(this.getCommandTarget());
+			}
 		}
 		
 		return result;
@@ -2896,17 +2927,33 @@ UnitCommand.FusionRelease = defineObject(BaseFusionCommand,
 	},
 	
 	_isPosEnabled: function(x, y) {
-		var n = root.getCurrentSession().getMapBoundaryValue();
+		var xMin, yMin;
+		var session = root.getCurrentSession();
 		
-		if (x < n || y < n) {
+		if (session === null) {
 			return false;
 		}
 		
-		if (x > CurrentMap.getWidth() - 1 - n || y > CurrentMap.getHeight() - 1 - n) {
+		xMin = this._getBoundaryX(session);
+		yMin = this._getBoundaryY(session);
+		
+		if (x < xMin || y < yMin) {
+			return false;
+		}
+		
+		if (x > CurrentMap.getWidth() - 1 - xMin || y > CurrentMap.getHeight() - 1 - yMin) {
 			return false;
 		}
 		
 		return true;
+	},
+	
+	_getBoundaryX: function(session) {
+		return session.getMapBoundaryValue();
+	},
+	
+	_getBoundaryY: function(session) {
+		return session.getMapBoundaryValue();
 	}
 }
 );

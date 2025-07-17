@@ -243,7 +243,7 @@ var StateControl = {
 		return false;
 	},
 	
-	// If "Prohibit to act", "Berserk" or "Auto AI" is included, decide the unit is uncontrollable.
+	// This method is mainly used to check if a specified unit can be operated during the player phase.
 	isTargetControllable: function(unit) {
 		var i, state, option;
 		var list = unit.getTurnStateList();
@@ -252,6 +252,7 @@ var StateControl = {
 		for (i = 0; i < count; i++) {
 			state = list.getData(i).getState();
 			option = state.getBadStateOption();
+			// If "Prohibit to act", "Berserk" or "Auto AI" is included, decide the unit is uncontrollable.
 			if (option === BadStateOption.NOACTION || option === BadStateOption.BERSERK || option === BadStateOption.AUTO) {
 				return false;
 			}

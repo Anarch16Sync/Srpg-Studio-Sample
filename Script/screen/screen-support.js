@@ -437,8 +437,10 @@ var SupportReciverEntity = defineObject(BaseObject,
 		var unitRenderParam = StructureBuilder.buildUnitRenderParam();
 		var alpha = this._receiver.isEnabled ? 255 : 128;
 		
-		unitRenderParam.alpha = alpha;
-		UnitRenderer.drawDefaultUnit(unit, x + 10, y + 10, unitRenderParam);
+		if (this._isReceiverDrawable()) {
+			unitRenderParam.alpha = alpha;
+			UnitRenderer.drawDefaultUnit(unit, x + 10, y + 10, unitRenderParam);
+		}
 	},
 	
 	_drawName: function(x, y, isActive) {
@@ -478,6 +480,10 @@ var SupportReciverEntity = defineObject(BaseObject,
 		var y = LayoutControl.getCenterY(-1, height);
 		
 		this._questionWindow.drawWindow(x, y);
+	},
+	
+	_isReceiverDrawable: function() {
+		return true;
 	},
 	
 	_getUnit: function() {

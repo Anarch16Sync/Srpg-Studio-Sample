@@ -531,8 +531,12 @@ var RecoveryAllFlowEntry = defineObject(BaseFlowEntry,
 		
 		for (i = 0 ; i < count; i++) {
 			unit = list.getData(i);
-			
 			recoveryValue = this._getRecoveryValue(unit);
+			
+			if (!this._isRecoveryAllowed(unit, recoveryValue)) {
+				continue;
+			}
+			
 			if (recoveryValue > 0) {
 				// Recover if HP is reduced.
 				if (unit.getHp() < ParamBonus.getMhp(unit)) {
@@ -559,26 +563,43 @@ var RecoveryAllFlowEntry = defineObject(BaseFlowEntry,
 	},
 	
 	_getRecoveryValue: function(unit) {
-		var skill, terrain;
 		var recoveryValue = 0;
 		
-		skill = SkillControl.getBestPossessionSkill(unit, SkillType.AUTORECOVERY);
+		recoveryValue += this._getRecoveryValueInternalForSkill(unit);
+		recoveryValue += this._getRecoveryValueInternalForTerrain(unit);
+		recoveryValue += this._getRecoveryValueInternalForState(unit);
+		
+		return recoveryValue;
+	},
+	
+	_getRecoveryValueInternalForSkill: function(unit) {
+		var recoveryValue = 0;
+		var skill = skill = SkillControl.getBestPossessionSkill(unit, SkillType.AUTORECOVERY);
+		
 		if (skill !== null) {
-			recoveryValue += skill.getSkillValue();
+			recoveryValue = skill.getSkillValue();
 			this._recentRecoverySkill = skill;
 		}
 		else {
 			this._recentRecoverySkill = null;
 		}
 		
-		terrain = PosChecker.getTerrainFromPos(unit.getMapX(), unit.getMapY());
+		return recoveryValue;
+	},
+	
+	_getRecoveryValueInternalForTerrain: function(unit) {
+		var recoveryValue = 0;
+		var terrain = PosChecker.getTerrainFromPos(unit.getMapX(), unit.getMapY());
+		
 		if (terrain !== null) {
-			recoveryValue += terrain.getAutoRecoveryValue();
+			recoveryValue = terrain.getAutoRecoveryValue();
 		}
 		
-		recoveryValue += StateControl.getHpValue(unit);
-		
 		return recoveryValue;
+	},
+	
+	_getRecoveryValueInternalForState: function(unit) {
+		return StateControl.getHpValue(unit);
 	},
 	
 	_arrangeValue: function(unit, recoveryValue) {
@@ -593,16 +614,27 @@ var RecoveryAllFlowEntry = defineObject(BaseFlowEntry,
 		return recoveryValue;
 	},
 	
+	_isRecoveryAllowed: function(unit, recoveryValue) {
+		return true;
+	},
+	
 	_getTurnRecoveryAnime: function() {
+		var anime;
+		
 		if (this._recentRecoverySkill !== null && this._recentRecoverySkill.getEasyAnime() !== null) {
-			return this._recentRecoverySkill.getEasyAnime();
+			anime = this._recentRecoverySkill.getEasyAnime();
+		}
+		else {
+			anime = root.queryAnime('easyrecovery');
 		}
 		
-		return root.queryAnime('easyrecovery');
+		return validateNull(anime);
 	},
 	
 	_getTurnDamageAnime: function() {
-		return root.queryAnime('easydamage');
+		var anime = root.queryAnime('easydamage');
+		
+		return validateNull(anime);
 	}
 }
 );

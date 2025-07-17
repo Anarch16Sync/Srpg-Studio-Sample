@@ -794,35 +794,15 @@ ConfigItem.MapUnitHpVisible = defineObject(BaseConfigtItem,
 }
 );
 
-ConfigItem.DamagePopup = defineObject(BaseConfigtItem,
-{
-	selectFlag: function(index) {
-		root.getMetaSession().setDefaultEnvironmentValue(18, index);
-	},
-	
-	getFlagValue: function() {
-		return root.getMetaSession().getDefaultEnvironmentValue(18);
-	},
-	
-	getConfigItemTitle: function() {
-		return StringTable.Config_DamagePopup;
-	},
-	
-	getConfigItemDescription: function() {
-		return StringTable.Config_DamagePopupDescription;
-	}
-}
-);
-
 ConfigItem.MapUnitSymbol = defineObject(BaseConfigtItem,
 {
 	selectFlag: function(index) {
-		root.getMetaSession().setDefaultEnvironmentValue(19, index);
+		root.getMetaSession().setDefaultEnvironmentValue(18, index);
 		MapSymbolDecorator.setupDecoration();
 	},
 	
 	getFlagValue: function() {
-		return root.getMetaSession().getDefaultEnvironmentValue(19);
+		return root.getMetaSession().getDefaultEnvironmentValue(18);
 	},
 	
 	getConfigItemTitle: function() {
@@ -831,6 +811,26 @@ ConfigItem.MapUnitSymbol = defineObject(BaseConfigtItem,
 	
 	getConfigItemDescription: function() {
 		return StringTable.Config_MapUnitSymbolDescription;
+	}
+}
+);
+
+ConfigItem.DamagePopup = defineObject(BaseConfigtItem,
+{
+	selectFlag: function(index) {
+		root.getMetaSession().setDefaultEnvironmentValue(19, index);
+	},
+	
+	getFlagValue: function() {
+		return root.getMetaSession().getDefaultEnvironmentValue(19);
+	},
+	
+	getConfigItemTitle: function() {
+		return StringTable.Config_DamagePopup;
+	},
+	
+	getConfigItemDescription: function() {
+		return StringTable.Config_DamagePopupDescription;
 	}
 }
 );

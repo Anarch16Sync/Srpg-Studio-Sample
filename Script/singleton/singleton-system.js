@@ -424,7 +424,13 @@ var WeaponEffectControl = {
 
 var PosChecker = {
 	getUnitFromPos: function(x, y) {
-		return root.getCurrentSession().getUnitFromPos(x, y);
+		var session = root.getCurrentSession();
+		
+		if (session === null) {
+			return null;
+		}
+		
+		return session.getUnitFromPos(x, y);
 	},
 	
 	getMovePointFromUnit: function(x, y, unit) {
@@ -436,6 +442,9 @@ var PosChecker = {
 		
 		// Get "terrain" associated with a specified position.
 		terrain = this.getTerrainFromPos(x, y);
+		if (terrain === null) {
+			return 0;
+		}
 		
 		// Get "Consume Mov" which is needed to move to terrain.
 		movePoint = terrain.getMovePoint(unit);
@@ -1132,54 +1141,10 @@ var ClassChangeChecker = {
 		
 		classGroup = this.getClassGroup(classGroupId);
 		if (classGroup !== null) {
-			classEntryArray = ClassChangeChecker.createClassEntryArray(unit, classGroup);
+			classEntryArray = this.createClassEntryArray(unit, classGroup);
 		}
 		
 		return classEntryArray;
-	},
-	
-	createClassEntryArray: function(unit, classGroup) {
-		var i, data, classEntry;
-		var classEntryArray = [];
-		var count = classGroup.getClassGroupEntryCount();
-		
-		for (i = 0; i < count; i++) {
-			data = classGroup.getClassGroupEntryData(i);
-			
-			classEntry = StructureBuilder.buildMultiClassEntry();
-			classEntry.cls = data.getClass();
-			classEntry.isChange = this.isClassChange(unit, data);
-			
-			if (classEntry.isChange) {
-				classEntry.name = data.getClass().getName();
-			}
-			else {
-				classEntry.name = StringTable.HideData_Question;
-			}
-			
-			classEntryArray.push(classEntry);
-		}
-		
-		return classEntryArray;
-	},
-	
-	isClassChange: function(unit, data) {
-		return data.isGlobalSwitchOn() && this._checkUnitParameter(unit, data);
-	},
-	
-	getClassGroup: function(classGroupId) {
-		var i, classGroup;
-		var list = root.getBaseData().getClassGroupList();
-		var count = list.getCount();
-		
-		for (i = 0; i < count; i++) {
-			classGroup = list.getData(i);
-			if (classGroup.getId() === classGroupId) {
-				return classGroup;
-			}
-		}
-		
-		return null;
 	},
 	
 	getClassGroupId: function(unit, isMapCall) {
@@ -1206,14 +1171,63 @@ var ClassChangeChecker = {
 		return classGroupId;
 	},
 	
-	_checkUnitParameter: function(unit, data) {
+	getClassGroup: function(classGroupId) {
+		var i, classGroup;
+		var list = root.getBaseData().getClassGroupList();
+		var count = list.getCount();
+		
+		for (i = 0; i < count; i++) {
+			classGroup = list.getData(i);
+			if (classGroup.getId() === classGroupId) {
+				return classGroup;
+			}
+		}
+		
+		return null;
+	},
+	
+	createClassEntryArray: function(unit, classGroup) {
+		var i, classEntry;
+		var classEntryArray = [];
+		var count = classGroup.getClassGroupEntryCount();
+		
+		for (i = 0; i < count; i++) {
+			classEntry = this._createClassEntry(unit, classGroup.getClassGroupEntryData(i));
+			classEntryArray.push(classEntry);
+		}
+		
+		return classEntryArray;
+	},
+	
+	isClassChange: function(unit, groupEntry) {
+		return groupEntry.isGlobalSwitchOn() && this._checkUnitParameter(unit, groupEntry);
+	},
+	
+	_createClassEntry: function(unit, groupEntry) {
+		var cls = groupEntry.getClass();
+		var classEntry = StructureBuilder.buildMultiClassEntry();
+		
+		classEntry.cls = cls;
+		classEntry.isChange = this.isClassChange(unit, groupEntry);
+			
+		if (classEntry.isChange) {
+			classEntry.name = cls.getName();
+		}
+		else {
+			classEntry.name = StringTable.HideData_Question;
+		}
+		
+		return classEntry;
+	},
+	
+	_checkUnitParameter: function(unit, groupEntry) {
 		var i, count, n, ou;
 		
 		// Parameter and level from HP until bld.
 		count = ParamType.COUNT + 1;
 		for (i = 0; i < count; i++) {
-			n = data.getParameterValue(i);
-			ou = data.getConditionValue(i);
+			n = groupEntry.getParameterValue(i);
+			ou = groupEntry.getConditionValue(i);
 			if (ou !== OverUnderType.NONE) {
 				if (!this._checkOverUnder(this._getUnitValue(unit, i), n, ou)) {
 					return false;
@@ -1478,6 +1492,21 @@ var UnitProvider = {
 			this.recoveryUnit(unit);
 			// Execute after deactivating fusion.
 			this._resetPos(unit);
+		}
+	},
+	
+	// If the "Heal player units upon entering the battle prep screen" is disabled, an injured unit is treated as incapacitated.
+	recoveryPlayerListWithoutHp: function() {
+		var i, unit, oldHp;
+		var list = PlayerList.getMainList();
+		var count = list.getCount();
+		
+		for (i = 0; i < count; i++) {
+			unit = list.getData(i);
+			oldHp = unit.getHp();
+			this.recoveryUnit(unit);
+			this._resetPos(unit);
+			unit.setHp(oldHp);
 		}
 	},
 	
@@ -1824,8 +1853,7 @@ var Miscellaneous = {
 	},
 	
 	getMaxLv: function(unit) {
-		var cls = unit.getClass();
-		var lv = cls.getMaxLv();
+		var lv = unit.getClass().getMaxLv();
 		
 		if (lv === -1) {
 			lv = DataConfig.getMaxLv();

@@ -859,7 +859,7 @@ var BaseBattler = defineObject(BaseObject,
 		var weapon = BattlerChecker.getRealBattleWeapon(this._unit);
 		
 		// Display weapons if the equipped weapons are not magic.
-		if (weapon !== null && weapon.getWeaponCategoryType() !== AttackTemplateType.MAGE) {
+		if (weapon !== null && weapon.getWeaponCategoryType() !== WeaponCategoryType.MAGIC) {
 			this._motion.setWeapon(weapon);
 		}
 	},
@@ -2187,23 +2187,6 @@ var UIBattleLayout = defineObject(BaseObject,
 	
 	_getTextAnimeOffsetY: function() {
 		return -32;
-	},
-	
-	_getLifeGadget: function(battler) {
-		var gadget;
-		var type = battler.getUnit().getUnitType();
-		
-		if (type === UnitType.PLAYER) {
-			gadget = root.queryUI('battleplayer_gadget');
-		}
-		else if (type === UnitType.ENEMY) {
-			gadget = root.queryUI('battleenemy_gadget');
-		}
-		else {
-			gadget = root.queryUI('battlepartner_gadget');
-		}
-		
-		return gadget;
 	},
 	
 	_getBackgroundImage: function() {

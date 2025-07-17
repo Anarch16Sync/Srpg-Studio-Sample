@@ -364,7 +364,7 @@ var UnitDeathFlowEntry = defineObject(BaseFlowEntry,
 		// Record that dead event will be processed later.
 		coreAttack.recordUnitLostEvent(true);
 		
-		// Check if the event doesn't exist, or could be ended.
+		// Check if the event doesn't exist, or could be ended. (If injuries are allowed, death events will not occur.)
 		if (this._capsuleEvent.enterCapsuleEvent(UnitEventChecker.getUnitLostEvent(this._passiveUnit), false) === EnterResult.NOTENTER) {
 			if (this.isFlowSkip() || this._coreAttack.isBattleCut()) {
 				this._doEndAction();

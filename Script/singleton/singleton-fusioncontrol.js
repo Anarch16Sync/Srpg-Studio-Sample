@@ -16,25 +16,33 @@ var FusionControl = {
 		
 		targetUnit.setInvisible(true);
 		
+		this._observeUnitHp(unit, fusionData, IncreaseType.INCREASE);
+		
 		return true;
 	},
 	
 	// The caller decides the unit release position.
 	releaseChild: function(unit) {
+		var fusionData;
 		var targetUnit = this.getFusionChild(unit);
 		
 		if (targetUnit === null) {
 			return false;
 		}
 		
+		fusionData = unit.getUnitStyle().getFusionData();
+		
 		unit.getUnitStyle().clearFusionInfo();
 		targetUnit.getUnitStyle().clearFusionInfo();
 		
 		targetUnit.setInvisible(false);
 		
+		this._observeUnitHp(unit, fusionData, IncreaseType.DECREASE);
+		
 		return true;
 	},
 	
+	// If both the unit and targetUnit are currently fused with someone, they cannot be swapped.
 	tradeChild: function(unit, targetUnit) {
 		var fusionData;
 		var childUnit = this.getFusionChild(unit);
@@ -55,6 +63,9 @@ var FusionControl = {
 		childUnit.getUnitStyle().setFusionData(fusionData);
 		
 		childUnit.setInvisible(true);
+		
+		this._observeUnitHp(unit, fusionData, IncreaseType.DECREASE);
+		this._observeUnitHp(targetUnit, fusionData, IncreaseType.INCREASE);
 		
 		return true;
 	},
@@ -196,6 +207,8 @@ var FusionControl = {
 		var fusionData = FusionControl.getFusionData(unit);
 		var isChildCheck = false;
 		
+		index = ParamGroup.getParameterType(index);
+		
 		if (fusionData !== null) {
 			// If normal fusion, get "Correction while fusion".
 			calc = fusionData.getStatusCalculation();
@@ -216,7 +229,6 @@ var FusionControl = {
 		}
 		
 		if (calc !== null) {
-			index = ParamGroup.getParameterType(index);
 			if (isChildCheck) {
 				childValue = SymbolCalculator.calculateEx(child, index, calc);
 				value = SymbolCalculator.calculate(n, childValue, calc.getOperatorSymbol(index));
@@ -271,6 +283,38 @@ var FusionControl = {
 		}
 		
 		return false;
+	},
+	
+	_observeUnitHp: function(unit, fusionData, increaseType) {
+		var hpPlus = this._getFusionCorrectionValue(unit, 0, fusionData);
+		
+		if (increaseType === IncreaseType.DECREASE) {
+			hpPlus *= -1;
+		}
+		
+		if (hpPlus !== 0) {
+			unit.setHp(unit.getHp() + hpPlus);
+		}
+		
+		// In "Stat Changes during Fusion" to lower HP, hp > mhp should not be satisfied.
+		MapHpControl.updateHp(unit);
+	},
+	
+	_getFusionCorrectionValue: function(unit, index, fusionData) {
+		var value = 0;
+		var calc = null;
+		
+		index = ParamGroup.getParameterType(index);
+		
+		if (fusionData !== null) {
+			calc = fusionData.getStatusCalculation();
+		}
+		
+		if (calc !== null) {
+			value = SymbolCalculator.calculate(0, calc.getValue(index), calc.getOperatorSymbol(index));
+		}
+		
+		return value;
 	}
 };
 

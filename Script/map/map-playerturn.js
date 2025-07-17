@@ -805,6 +805,7 @@ var MapSequenceCommand = defineObject(BaseObject,
 	_pushFlowEntries: function(straightFlow) {
 		// If need to do something after action ends, add an object.
 		straightFlow.pushFlowEntry(RepeatMoveFlowEntry);
+		straightFlow.pushFlowEntry(OneMoreFlowEntry);
 		straightFlow.pushFlowEntry(UnitWaitFlowEntry);
 		straightFlow.pushFlowEntry(ReactionFlowEntry);
 	}
@@ -854,6 +855,9 @@ var RepeatMoveFlowEntry = defineObject(BaseFlowEntry,
 	_prepareMemberData: function(playerTurn) {
 		this._playerTurn = playerTurn;
 		this._mapSequenceArea = createObject(MapSequenceArea);
+		
+		// Save before executing "Use Leftover Mov". The property is used in the OneMoreFlowEntry object.
+		playerTurn.tempNormalMov = playerTurn.getTurnTargetUnit().getMostResentMov();
 	},
 	
 	_completeMemberData: function(playerTurn) {
@@ -869,6 +873,14 @@ var RepeatMoveFlowEntry = defineObject(BaseFlowEntry,
 	_isTargetMovable: function(playerTurn) {
 		var unit = playerTurn.getTurnTargetUnit();
 		
+		if (!this._isTargetMovableInternal(unit)) {
+			return false;
+		}
+		
+		return unit.getMostResentMov() !== ParamBonus.getMov(unit);
+	},
+	
+	_isTargetMovableInternal: function(unit) {
 		if (StateControl.isBadStateOption(unit, BadStateOption.NOACTION)) {
 			return false;
 		}
@@ -881,7 +893,108 @@ var RepeatMoveFlowEntry = defineObject(BaseFlowEntry,
 			return false;
 		}
 		
-		return unit.getMostResentMov() !== ParamBonus.getMov(unit);
+		return true;
+	}
+}
+);
+
+var OneMoreFlowEntry = defineObject(BaseFlowEntry,
+{
+	_unitCommandManager: null,
+	
+	enterFlowEntry: function(playerTurn) {
+		this._prepareMemberData(playerTurn);
+		return this._completeMemberData(playerTurn);
+	},
+	
+	moveFlowEntry: function() {
+		var nextmode;
+		var prevmode = this._unitCommandManager.getCycleMode();
+		var result = this._unitCommandManager.moveListCommandManager();
+		
+		nextmode = this._unitCommandManager.getCycleMode();
+		
+		// Prevents the command from closing when the cancel key is accidentally pressed.
+		if (prevmode === ListCommandManagerMode.OPEN && nextmode === ListCommandManagerMode.TITLE) {
+			return result;
+		}
+		
+		return MoveResult.CONTINUE;
+	},
+	
+	drawFlowEntry: function() {
+		this._unitCommandManager.drawListCommandManager();
+	},
+	
+	_prepareMemberData: function(playerTurn) {
+		this._unitCommandManager = createObject(UnitCommand);
+	},
+	
+	_completeMemberData: function(playerTurn) {
+		var unit = playerTurn.getTurnTargetUnit();
+		var normalMov = playerTurn.tempNormalMov;
+		
+		delete playerTurn.tempNormalMov;
+		
+		if (typeof normalMov !== 'number') {
+			return EnterResult.NOTENTER;
+		}
+		
+		// normalMov refers to "Mov Consumed" through normal movement.
+		// unit.getMostRecentMov() refers to "Mov Consumed" through "Use Leftover Mov".
+		// Adding these together reveals the total movement distance.
+		unit.setMostResentMov(normalMov + unit.getMostResentMov());
+		
+		if (!this._isTargetMovable(playerTurn)) {
+			return EnterResult.NOTENTER;
+		}
+		
+		this._unitCommandManager.setListCommandUnit(unit);
+		this._unitCommandManager.openListCommandManager();
+		
+		return EnterResult.OK;
+	},
+	
+	_isTargetMovable: function(playerTurn) {
+		var unit = playerTurn.getTurnTargetUnit();
+		
+		if (!this._isCommandAllowed(unit)) {
+			return false;
+		}
+		
+		if (!this._isTargetMovableInternal(unit)) {
+			return false;
+		}
+		
+		return unit.getMostResentMov() <= ParamBonus.getMov(unit);
+	},
+	
+	_isCommandAllowed: function(unit) {
+		var skill = SkillControl.getPossessionSkill(unit, SkillType.REPEATMOVE);
+		
+		// If "Show Commands After Move" is enabled, getSkillValue returns 1.
+		if (skill === null || skill.getSkillValue() !== 1) {
+			// The 'Can "Move Agiain"' option in "Class Options" does not allow commands to be displayed.
+			return false;
+		}
+		
+		return true;
+	},
+	
+	_isTargetMovableInternal: function(unit) {
+		if (StateControl.isBadStateOption(unit, BadStateOption.NOACTION)) {
+			return false;
+		}
+		
+		if (StateControl.isBadStateOption(unit, BadStateOption.BERSERK)) {
+			return false;
+		}
+		
+		if (StateControl.isBadStateOption(unit, BadStateOption.AUTO)) {
+			return false;
+		}
+		
+		return true;
 	}
 }
 );
@@ -913,7 +1026,7 @@ var UnitWaitFlowEntry = defineObject(BaseFlowEntry,
 		
 		unit.setMostResentMov(0);
 		
-		// Unless it's unlimited action, then wait.
+		// Unless it's "Infinite Actions", then wait.
 		if (!Miscellaneous.isPlayerFreeAction(unit)) {
 			unit.setWait(true);
 		}
@@ -952,10 +1065,7 @@ var ReactionFlowEntry = defineObject(BaseFlowEntry,
 	
 	moveFlowEntry: function() {
 		if (this._dynamicAnime.moveDynamicAnime() !== MoveResult.CONTINUE) {
-			this._targetUnit.setReactionTurnCount(this._skill.getSkillValue());
-			this._targetUnit.setWait(false);
-			// The following code is for the enemy AI.
-			this._targetUnit.setOrderMark(OrderMarkType.FREE);
+			this._doEndAction();
 			return MoveResult.END;
 		}
 		
@@ -972,35 +1082,58 @@ var ReactionFlowEntry = defineObject(BaseFlowEntry,
 	},
 	
 	_completeMemberData: function(playerTurn) {
-		var skill;
-		
-		if (this._targetUnit.getHp() === 0) {
+		if (!this._isReactionAllowed()) {
 			return EnterResult.NOTENTER;
 		}
 		
-		// Action again doesn't occur when it's unlimited action.
-		if (Miscellaneous.isPlayerFreeAction(this._targetUnit)) {
+		if (!this._checkReactionSkill()) {
 			return EnterResult.NOTENTER;
 		}
-		
-		if (this._targetUnit.getReactionTurnCount() !== 0) {
-			return EnterResult.NOTENTER;
-		}
-		
-		skill = SkillControl.getBestPossessionSkill(this._targetUnit, SkillType.REACTION);
-		if (skill === null) {
-			return EnterResult.NOTENTER;
-		}
-		
-		if (!Probability.getInvocationProbabilityFromSkill(this._targetUnit, skill)) {
-			return EnterResult.NOTENTER;
-		}
-		
-		this._skill = skill;
 		
 		this._startReactionAnime();
 		
 		return EnterResult.OK;
+	},
+	
+	_isReactionAllowed: function() {
+		if (this._targetUnit.getHp() === 0) {
+			return false;
+		}
+		
+		// Action again doesn't occur when it's "Infinite Actions".
+		if (Miscellaneous.isPlayerFreeAction(this._targetUnit)) {
+			return false;
+		}
+		
+		return true;
+	},
+	
+	_checkReactionSkill: function() {
+		var skill;
+		
+		if (this._targetUnit.getReactionTurnCount() !== 0) {
+			return false;
+		}
+		
+		skill = SkillControl.getBestPossessionSkill(this._targetUnit, SkillType.REACTION);
+		if (skill === null) {
+			return false;
+		}
+		
+		if (!Probability.getInvocationProbabilityFromSkill(this._targetUnit, skill)) {
+			return false;
+		}
+		
+		this._skill = skill;
+		
+		return true;
+	},
+	
+	_doEndAction: function() {
+		this._targetUnit.setReactionTurnCount(this._skill.getSkillValue());
+		this._targetUnit.setWait(false);
+		// The following code is for the enemy AI.
+		this._targetUnit.setOrderMark(OrderMarkType.FREE);
 	},
 	
 	_startReactionAnime: function() {

@@ -30,6 +30,11 @@ var SetupControl = {
 	}
 };
 
+var LoadControl = {
+	start: function(customObject) {
+	}
+};
+
 var RetryControl = {
 	// It's called when retrying a game.
 	// The argument is the return value of _getCustomObject.
@@ -181,11 +186,11 @@ var EnvironmentControl = {
 		return root.getMetaSession().getDefaultEnvironmentValue(17);
 	},
 	
-	isDamagePopup: function() {
+	isMapUnitSymbol: function() {
 		return root.getMetaSession().getDefaultEnvironmentValue(18) === 0;
 	},
 	
-	isMapUnitSymbol: function() {
+	isDamagePopup: function() {
 		return root.getMetaSession().getDefaultEnvironmentValue(19) === 0;
 	},
 	
@@ -610,6 +615,10 @@ var DefineControl = {
 	
 	getDataNameLength: function() {
 		return 9;
+	},
+	
+	getScreenScrollbarWidthForSimpleText: function() {
+		return 400;
 	},
 	
 	getVisibleUnitItemCount: function() {

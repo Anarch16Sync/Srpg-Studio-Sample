@@ -1214,6 +1214,10 @@ var MotionIdValue = {
 	NONE: -1
 };
 
+var ChronicInjuryHp = {
+	ZERO: 0
+};
+
 var XPoint = [-1, 0, 1, 0];
 
 var YPoint = [0, -1, 0, 1];

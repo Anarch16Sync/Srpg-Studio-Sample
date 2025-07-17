@@ -270,9 +270,7 @@ var ClassChangeSelectManager = defineObject(BaseWindowManager,
 	},
 	
 	_checkGroup: function(unit, item) {
-		var i, count, classGroupId, classUpCount, classUpMaxCount;
-		var group = null;
-		var info = item.getClassChangeInfo();
+		var classGroupId, classUpMaxCount;
 		
 		if (DataConfig.isBattleSetupClassChangeAllowed()) {
 			// If class can be changed in the SceneType.BATTLESETUP, class group 2 is used.
@@ -280,13 +278,13 @@ var ClassChangeSelectManager = defineObject(BaseWindowManager,
 			classUpMaxCount = 1;
 		}
 		else {
-			if (this._unit.getClassUpCount() === 0) {
+			if (unit.getClassUpCount() === 0) {
 				// If class has never been changed yet, class group 1 is used. 
-				classGroupId = this._unit.getClassGroupId1();
+				classGroupId = unit.getClassGroupId1();
 			}
 			else {
 				// If class has been changed, class group 2 is used.
-				classGroupId = this._unit.getClassGroupId2();
+				classGroupId = unit.getClassGroupId2();
 			}
 			classUpMaxCount = 2;
 		}
@@ -298,8 +296,16 @@ var ClassChangeSelectManager = defineObject(BaseWindowManager,
 			return null;
 		}
 		
+		return this._checkGroupInternal(unit, item, classGroupId, classUpMaxCount);
+	},
+	
+	_checkGroupInternal: function(unit, item, classGroupId, classUpMaxCount) {
+		var i;
+		var info = item.getClassChangeInfo();
+		var count = info.getClassGroupCount();
+		var group = null;
+		
 		// Check if the unit's groupId is included.
-		count = info.getClassGroupCount();
 		for (i = 0; i < count; i++) {
 			group = info.getClassGroupData(i);
 			if (group.getId() === classGroupId) {
@@ -314,8 +320,7 @@ var ClassChangeSelectManager = defineObject(BaseWindowManager,
 			return null;
 		}
 		
-		classUpCount = unit.getClassUpCount();
-		if (classUpCount >= classUpMaxCount) {
+		if (unit.getClassUpCount() >= classUpMaxCount) {
 			// Class has already changed, so no more class change is possible.
 			this._infoWindow.setInfoMessage(StringTable.ClassChange_UnableClassChangeMore);
 			this.changeCycleMode(ClassChangeSelectMode.MSG);

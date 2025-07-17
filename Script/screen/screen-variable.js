@@ -128,7 +128,7 @@ var VariableScrollbar = defineObject(BaseScrollbar,
 	},
 	
 	getObjectWidth: function() {
-		return 400;
+		return DefineControl.getScreenScrollbarWidthForSimpleText();
 	},
 	
 	getObjectHeight: function() {

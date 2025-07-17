@@ -85,26 +85,22 @@ var MouseControl = {
 	
 	// Get the index of entry to respond to the current mouse cursor.
 	getIndexFromMouse: function(scrollbar) {
-		var i, j, x, y;
+		var i, j, x, y, xCursor, yCursor;
 		var col = scrollbar.getCol();
 		var rowCount = scrollbar.getRowCount();
 		var width = scrollbar.getObjectWidth() + scrollbar.getSpaceX();
 		var height = scrollbar.getObjectHeight() + scrollbar.getSpaceY();
 		var index = 0;
 		var n = (scrollbar.getScrollYValue() * scrollbar.getCol()) + scrollbar.getScrollXValue();
-		var xCursor = root.getMouseX() - root.getViewportX();
-		var yCursor = root.getMouseY() - root.getViewportY();
 		var xStart = scrollbar.xRendering;
 		var yStart = scrollbar.yRendering;
 		
-		if (!EnvironmentControl.isMouseOperation()) {
-			return -1;
+		if (!this._isMouseEnabled()) {
+			return -1
 		}
 		
-		// If the current screen state is a full screen with software, mouse input is ignored.
-		if (root.getAppScreenMode() === AppScreenMode.SOFTFULLSCREEN) {
-			return -1;
-		}
+		xCursor = root.getMouseX() - root.getViewportX();
+		yCursor = root.getMouseY() - root.getViewportY();
 		
 		for (i = 0; i < rowCount; i++) {
 			y = yStart + (i * height);
@@ -410,6 +406,19 @@ var MouseControl = {
 		}
 		
 		return null;
+	},
+	
+	_isMouseEnabled: function() {
+		if (!EnvironmentControl.isMouseOperation()) {
+			return false;
+		}
+		
+		// If the current screen state is a full screen with software, mouse input is ignored.
+		if (root.getAppScreenMode() === AppScreenMode.SOFTFULLSCREEN) {
+			return false;
+		}
+		
+		return true;
 	},
 	
 	_startMouseTracking: function(x, y) {

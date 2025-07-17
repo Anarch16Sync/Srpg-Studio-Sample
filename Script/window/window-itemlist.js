@@ -108,7 +108,7 @@ var ItemListScrollbar = defineObject(BaseScrollbar,
 	_availableArray: null,
 	
 	drawScrollContent: function(x, y, object, isSelect, index) {
-		var isAvailable, color;
+		var isAvailable, color, alpha;
 		var textui = this.getParentTextUI();
 		var font = textui.getFont();
 		
@@ -122,15 +122,11 @@ var ItemListScrollbar = defineObject(BaseScrollbar,
 		else {
 			isAvailable = true;
 		}
-		color = this._getTextColor(object, isSelect, index);
 		
-		if (isAvailable) {
-			ItemRenderer.drawItem(x, y, object, color, font, true);
-		}
-		else {
-			// Draw it tinted if items cannot be used.
-			ItemRenderer.drawItemAlpha(x, y, object, color, font, true, 120);
-		}
+		color = this._getTextColor(object, isSelect, index);
+		alpha = this._getTextAlpha(object, isSelect, index, isAvailable);
+		
+		ItemRenderer.drawItemAlpha(x, y, object, color, font, true, alpha);
 	},
 	
 	playOptionSound: function() {
@@ -276,6 +272,17 @@ var ItemListScrollbar = defineObject(BaseScrollbar,
 	
 	_isWarningItem: function(object) {
 		return this._isWarningAllowed && Miscellaneous.isTradeDisabled(this._unit, object);
+	},
+	
+	_getTextAlpha: function(object, isSelect, index, isAvailable) {
+		var alpha = 255;
+		
+		if (!isAvailable) {
+			// // Draw it tinted if items cannot be used.
+			alpha = 120;
+		}
+		
+		return alpha;
 	}
 }
 );

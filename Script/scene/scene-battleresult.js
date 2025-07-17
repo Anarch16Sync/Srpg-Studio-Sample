@@ -606,6 +606,9 @@ var BattleResultSaveFlowEntry = defineObject(BaseFlowEntry,
 		if (DataConfig.isBattleSetupRecoverable() || this._getSceneType() === SceneType.REST) {
 			UnitProvider.recoveryPlayerList();
 		}
+		else {
+			UnitProvider.recoveryPlayerListWithoutHp();
+		}
 	}
 }
 );

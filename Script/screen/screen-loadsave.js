@@ -30,11 +30,10 @@ var LoadSaveScreen = defineObject(BaseScreen,
 	},
 	
 	drawScreenCycle: function() {
-		var x, y;
+		var x = LayoutControl.getCenterX(-1, this._scrollbar.getScrollbarWidth());
+		var y = LayoutControl.getCenterY(-1, this._scrollbar.getScrollbarHeight());
 		var mode = this.getCycleMode();
 		
-		x = LayoutControl.getCenterX(-1, this._scrollbar.getScrollbarWidth());
-		y = LayoutControl.getCenterY(-1, this._scrollbar.getScrollbarHeight());
 		this._scrollbar.drawScrollbar(x, y);
 	
 		if (mode === LoadSaveMode.SAVECHECK) {

@@ -16,19 +16,19 @@ var TextFormat = {
 
 var TextRenderer = {
 	drawSingleCharacter: function(x, y, c, color, font) {
-		root.getGraphicsManager().drawText(x, y, c, -1, color, 255, font);
+		root.getGraphicsManager().drawText(x, y, c, -1, color, 255, validateFont(font));
 	},
 	
 	drawCharText: function(x, y, text, count, color, font) {
-		root.getGraphicsManager().drawCharText(x, y, text, count, color, 255, font);
+		root.getGraphicsManager().drawCharText(x, y, text, count, color, 255, validateFont(font));
 	},
 	
 	drawText: function(x, y, text, length, color, font) {
-		root.getGraphicsManager().drawText(x, y, text, length, color, 255, font);
+		root.getGraphicsManager().drawText(x, y, text, length, color, 255, validateFont(font));
 	},
 	
 	drawRangeText: function(range, format, text, length, color, font) {
-		root.getGraphicsManager().drawTextRange(range.x, range.y, range.width, range.height, format, text, length, color, 255, font);
+		root.getGraphicsManager().drawTextRange(range.x, range.y, range.width, range.height, format, text, length, color, 255, validateFont(font));
 	},
 	
 	drawAlphaText: function(x, y, text, length, color, alpha, font) {
@@ -36,7 +36,7 @@ var TextRenderer = {
 	},
 	
 	drawRangeAlphaText: function(range, format, text, length, color, alpha, font) {
-		root.getGraphicsManager().drawTextRange(range.x, range.y, range.width, range.height, format, text, length, color, alpha, font);
+		root.getGraphicsManager().drawTextRange(range.x, range.y, range.width, range.height, format, text, length, color, alpha, validateFont(font));
 	},
 	
 	// If the number is drawn next to the character, call this method, not the drawText.
@@ -149,11 +149,11 @@ var TextRenderer = {
 	},
 	
 	getTextWidth: function(text, font) {
-		return root.getGraphicsManager().getTextWidth(text, font);
+		return root.getGraphicsManager().getTextWidth(text, validateFont(font));
 	},
 	
 	getTextHeight: function(text, font) {
-		return root.getGraphicsManager().getTextHeight(text, font);
+		return root.getGraphicsManager().getTextHeight(text, validateFont(font));
 	},
 	
 	getDefaultFont: function() {
@@ -979,7 +979,7 @@ var StatusRenderer = {
 			}
 			
 			x += space;
-		}	
+		}
 	},
 	
 	_getTextLength: function() {
@@ -1076,7 +1076,7 @@ var NumberRenderer = {
 		for (i = 0; i < count; i++) {
 			pic.setAlpha(alpha);
 			pic.drawParts(x, y, digitArray[i] * width, ySrc, width, height);
-			x -= 9;
+			x += this._getNumberGap();
 		}
 	},
 	
@@ -1105,7 +1105,7 @@ var NumberRenderer = {
 		for (i = count - 1; i >= 0; i--) {
 			pic.setAlpha(alpha);
 			pic.drawParts(x, y, digitArray[i] * width, ySrc, width, height);
-			x += 9;
+			x += this._getRightNumberGap();
 		}
 	},
 	
@@ -1134,8 +1134,20 @@ var NumberRenderer = {
 		for (i = count - 1; i >= 0; i--) {
 			pic.setAlpha(alpha);
 			pic.drawParts(x, y, digitArray[i] * width, ySrc, width, height);
-			x += 15;
+			x += this._getAttackNumberGap();
 		}
+	},
+	
+	_getNumberGap: function() {
+		return -9;
+	},
+	
+	_getRightNumberGap: function() {
+		return 9;
+	},
+	
+	_getAttackNumberGap: function() {
+		return 15;
 	}
 };
 

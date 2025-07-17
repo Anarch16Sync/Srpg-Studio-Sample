@@ -593,6 +593,11 @@ var SortieSetting = defineObject(BaseScreen,
 	},
 	
 	isSortie: function(unit) {
+		// A unit that is incapacitated cannot sortie.
+		if (!DataConfig.isBattleSetupRecoverable() && unit.getHp() === ChronicInjuryHp.ZERO) {
+			return false;
+		}
+		
 		return cur_map.getSortieAggregation().isCondition(unit);
 	},
 	

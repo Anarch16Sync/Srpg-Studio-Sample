@@ -738,30 +738,34 @@ var MetamorphozeScreen = defineObject(MultiClassChangeScreen,
 	},
 	
 	_getClassEntryArray: function(screenParam) {
-		var i, classEntry, metamorphozeData;
+		var i, classEntry;
 		var unit = screenParam.unit;
 		var count = screenParam.refList.getTypeCount();
 		var classEntryArray = [];
 		
 		for (i = 0; i < count; i++) {
-			metamorphozeData = screenParam.refList.getTypeData(i);
-			
-			classEntry = StructureBuilder.buildMultiClassEntry();
-			classEntry.cls = metamorphozeData.getClass();
-			classEntry.isChange = MetamorphozeControl.isMetamorphozeAllowed(unit, metamorphozeData);
-			if (classEntry.isChange) {
-				classEntry.name = metamorphozeData.getName();
-			}
-			else {
-				classEntry.name = StringTable.HideData_Question;
-			}
-			
-			classEntry.metamorphozeData = metamorphozeData;
-			
+			classEntry = this._createClassEntry(unit, screenParam.refList.getTypeData(i));
 			classEntryArray.push(classEntry);
 		}
 		
 		return classEntryArray;
+	},
+	
+	_createClassEntry: function(unit, metamorphozeData) {
+		var classEntry = StructureBuilder.buildMultiClassEntry();
+		
+		classEntry.cls = metamorphozeData.getClass();
+		classEntry.isChange = MetamorphozeControl.isMetamorphozeAllowed(unit, metamorphozeData);
+		if (classEntry.isChange) {
+			classEntry.name = metamorphozeData.getName();
+		}
+		else {
+			classEntry.name = StringTable.HideData_Question;
+		}
+		
+		classEntry.metamorphozeData = metamorphozeData;
+		
+		return classEntry;
 	},
 	
 	_getQuestionMessage: function() {

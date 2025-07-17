@@ -510,6 +510,7 @@ var VirtualAttackControl = {
 		weapon = virtualAttackUnit.weapon;
 		flag = state.getBadStateFlag();
 		if (flag & BadStateFlag.PHYSICS) {
+			// Not only WeaponCategoryType.PHYSICS, but also WeaponCategoryType.SHOOT is "Physical Attack".
 			if (weapon !== null && weapon.getWeaponCategoryType() !== WeaponCategoryType.MAGIC) {
 				return true;
 			}
@@ -777,11 +778,12 @@ AttackEvaluator.ActiveAction = defineObject(BaseAttackEvaluator,
 		var active = virtualActive.unitSelf;
 		var damageActive = attackEntry.damageActive;
 		var damagePassive = attackEntry.damagePassive;
+		var absorptionPercent = this._isAbsorption(virtualActive, virtualPassive, attackEntry);
 		
-		if (this._isAbsorption(virtualActive, virtualPassive, attackEntry)) {
+		if (absorptionPercent > 0) {
 			max = ParamBonus.getMhp(active);
 			
-			damageActive = damagePassive;
+			damageActive = Math.floor(damagePassive * (absorptionPercent / 100));
 			
 			if (virtualActive.hp + damageActive > max) {
 				damageActive = max - virtualActive.hp;
@@ -797,25 +799,35 @@ AttackEvaluator.ActiveAction = defineObject(BaseAttackEvaluator,
 		return damageActive;
 	},
 	
+	// This method returns a number, not true/false, but the name remains as is for compatibility.
 	_isAbsorption: function(virtualActive, virtualPassive, attackEntry) {
-		var isWeaponAbsorption;
+		var weaponAbsorptionPercent = 0;
+		var skillAbsorptionPercent = 0;
 		var active = virtualActive.unitSelf;
 		var passive = virtualPassive.unitSelf;
 		var weapon = virtualActive.weapon;
+		var skill = SkillControl.checkAndPushSkill(active, passive, attackEntry, true, SkillType.DAMAGEABSORPTION);
+		
+		if (skill !== null) {
+			skillAbsorptionPercent = skill.getSkillValue();
+		}
+		
+		weaponAbsorptionPercent = this._getWeaponAbsorptionPercent(weapon);
+		
+		// There are two types of "Damage Absorption": "Skills" and "Weapon Option".
+		// The following code uses larger percentages, but there is also a way to increase the percentage by adding both.
+		return Math.max(weaponAbsorptionPercent, skillAbsorptionPercent);
+	},
+	
+	_getWeaponAbsorptionPercent: function(weapon) {
+		var weaponAbsorptionPercent = 0;
 		
 		if (weapon !== null && weapon.getWeaponOption() === WeaponOption.HPABSORB) {
-			isWeaponAbsorption = true;
-		}
-		else {
-			isWeaponAbsorption = false;
+			// The "Damage Absorption" of "Weapon Option" is 100% by default.
+			weaponAbsorptionPercent = 100;
 		}
 		
-		if (!isWeaponAbsorption) {
-			// Check the skill if weapon option has no absorb.
-			isWeaponAbsorption = SkillControl.checkAndPushSkill(active, passive, attackEntry, true, SkillType.DAMAGEABSORPTION) !== null;
-		}
-		
-		return isWeaponAbsorption;
+		return weaponAbsorptionPercent;
 	},
 	
 	_getDamageGuardValue: function(virtualActive, virtualPassive, attackEntry) {

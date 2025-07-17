@@ -198,9 +198,9 @@ var EntireRecoveryControl = {
 	getTargetArray: function(unit, item) {
 		var i, j, count, list, targetUnit;
 		var filter = FilterControl.getBestFilter(unit.getUnitType(), item.getFilterFlag());
-		var listArray =  FilterControl.getListArray(filter);
+		var listArray = FilterControl.getListArray(filter);
 		var listCount = listArray.length;
-		var arr= [];
+		var arr = [];
 		var aggregation = item.getTargetAggregation();
 		
 		for (i = 0; i < listCount; i++) {

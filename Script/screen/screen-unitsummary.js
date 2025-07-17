@@ -165,12 +165,12 @@ var UnitSummaryScrollbar = defineObject(BaseScrollbar,
 		
 		TextRenderer.drawKeywordText(x + 50, y + 15, unit.getName(), this._getNameLength(), color, font);
 		
-		NumberRenderer.drawRightNumberColor(x + 180, y + 15, unit.getId(), this._getColorIndexFromUnit(unit), 255);
+		NumberRenderer.drawRightNumberColor(x + this._getNumberSpaceX(), y + 15, unit.getId(), this._getColorIndexFromUnit(unit), 255);
 	},
 	
 	_drawRight: function(x, y, unit, isSelect, index) {
 		var i, color, range;
-		var dx = 265;
+		var dx = this._getRightZoneX();
 		var arr = [StringTable.UnitSummary_Alive, StringTable.UnitSummary_Death, StringTable.UnitSummary_Erase, StringTable.UnitSummary_Immortal];
 		var count = arr.length;
 		var textui = this.getParentTextUI();
@@ -220,6 +220,14 @@ var UnitSummaryScrollbar = defineObject(BaseScrollbar,
 	
 	_getWidth: function() {
 		return 55 + HorizontalLayout.OBJECT_SPACE;
+	},
+	
+	_getNumberSpaceX: function() {
+		return 180;
+	},
+	
+	_getRightZoneX: function() {
+		return 265;
 	},
 	
 	_getNameLength: function() {

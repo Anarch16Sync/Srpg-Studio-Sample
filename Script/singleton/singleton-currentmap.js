@@ -453,13 +453,17 @@ var MapHpDecorator = {
 			obj.setStrokeInfo(strokeColor, strokeAlpha, 1, true);
 			obj.addRectangle(pos.x, pos.y, width, height);
 			
-			obj.addHp(pos.x, pos.y, this._getNumberColorIndex(hpType));
+			this._addHp(obj, pos, this._getNumberColorIndex(hpType));
 		}
 		else if (hpType === 1) {
 			obj.addGauge(pos.x, pos.y, 1);
 		}
 		
 		obj.endDecoration();
+	},
+	
+	_addHp: function(obj, pos, colorIndex) {
+		obj.addHp(pos.x, pos.y, colorIndex);
 	},
 	
 	_getColor: function(type) {

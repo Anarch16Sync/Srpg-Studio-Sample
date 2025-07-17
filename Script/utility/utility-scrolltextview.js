@@ -428,6 +428,7 @@ var PictureScrollBlock = defineObject(BaseScrollBlock,
 			data = list.getCollectionData(i, 0);
 			if (data.getName() === value) {
 				this._pictureId = data.getId();
+				break;
 			}
 		}
 	},

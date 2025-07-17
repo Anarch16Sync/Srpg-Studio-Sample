@@ -93,6 +93,12 @@ var StealItemUse = defineObject(BaseItemUse,
 	},
 	
 	validateItem: function(itemTargetInfo) {
+		// If a player uses a "Steal" item from the item slot, it is stolen via the screen, so targetItem does not need to be initialized.
+		if (itemTargetInfo.unit.getUnitType() === UnitType.PLAYER && root.getCurrentScene() !== SceneType.EVENT) {
+			return itemTargetInfo.targetUnit !== null;
+		}
+		
+		// However, if a "Steal" item is used with the "Use Item" event command, or if an enemy AI uses a "Steal" item, targetItem must be initialized.
 		return itemTargetInfo.targetUnit !== null && itemTargetInfo.targetItem !== null;
 	},
 	

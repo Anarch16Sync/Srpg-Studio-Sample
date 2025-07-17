@@ -47,27 +47,8 @@ var ObjectiveWindow = defineObject(BaseWindow,
 	_objectArray: null,
 	
 	setObjectiveData: function() {
-		var text1, text2, text3, objectArray;
-		var mapInfo = root.getCurrentSession().getCurrentMapInfo();
-		
-		this._scrollbarVictory = createScrollbarObject(ObjectiveScrollbar, this);
-		this._scrollbarDefeat = createScrollbarObject(ObjectiveScrollbar, this);
-		
-		text1 = mapInfo.getVictoryCondition(0);
-		text2 = mapInfo.getVictoryCondition(1);
-		text3 = mapInfo.getVictoryCondition(2);
-		
-		objectArray = [text1, text2, text3];
-		this._scrollbarVictory.setScrollFormation(1, objectArray.length);
-		this._scrollbarVictory.setObjectArray(objectArray);
-		
-		text1 = mapInfo.getDefeatCondition(0);
-		text2 = mapInfo.getDefeatCondition(1);
-		text3 = mapInfo.getDefeatCondition(2);
-		
-		objectArray = [text1, text2, text3];
-		this._scrollbarDefeat.setScrollFormation(1, objectArray.length);
-		this._scrollbarDefeat.setObjectArray(objectArray);
+		this._createVictoryScrollbar();
+		this._createDefeatScrollbar();
 		
 		this._faceZone = createObject(ObjectiveFaceZone);
 		
@@ -97,6 +78,30 @@ var ObjectiveWindow = defineObject(BaseWindow,
 	
 	getWindowHeight: function() {
 		return 340;
+	},
+	
+	_createVictoryScrollbar: function() {
+		var mapInfo = root.getCurrentSession().getCurrentMapInfo();
+		var text1 = mapInfo.getVictoryCondition(0);
+		var text2 = mapInfo.getVictoryCondition(1);
+		var text3 = mapInfo.getVictoryCondition(2);
+		var objectArray = [text1, text2, text3];
+		
+		this._scrollbarVictory = createScrollbarObject(ObjectiveScrollbar, this);
+		this._scrollbarVictory.setScrollFormation(1, objectArray.length);
+		this._scrollbarVictory.setObjectArray(objectArray);
+	},
+	
+	_createDefeatScrollbar: function() {
+		var mapInfo = root.getCurrentSession().getCurrentMapInfo();
+		var text1 = mapInfo.getDefeatCondition(0);
+		var text2 = mapInfo.getDefeatCondition(1);
+		var text3 = mapInfo.getDefeatCondition(2);
+		var objectArray = [text1, text2, text3];
+		
+		this._scrollbarDefeat = createScrollbarObject(ObjectiveScrollbar, this);
+		this._scrollbarDefeat.setScrollFormation(1, objectArray.length);
+		this._scrollbarDefeat.setObjectArray(objectArray);
 	},
 	
 	_drawObjectiveArea: function(x, y) {

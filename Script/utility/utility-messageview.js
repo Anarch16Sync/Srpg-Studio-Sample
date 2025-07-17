@@ -684,7 +684,7 @@ var BacklogWindow = defineObject(BaseWindow,
 	_scrollbar: null,
 
 	setWindowData: function() {
-		var count = Math.floor(root.getGameAreaHeight() / 70);
+		var count = this._getVisibleBacklogObjectCount();
 		
 		this._scrollbar = createScrollbarObject(BacklogScrollbar, this);
 		this._scrollbar.setScrollFormation(1, count);
@@ -731,6 +731,10 @@ var BacklogWindow = defineObject(BaseWindow,
 	
 	getWindowHeight: function() {
 		return this._scrollbar.getScrollbarHeight() + (this.getWindowYPadding() * 2);
+	},
+	
+	_getVisibleBacklogObjectCount: function() {
+		return Math.floor(root.getGameAreaHeight() / 70);
 	},
 	
 	_setFirstIndex: function() {
@@ -912,6 +916,7 @@ var BacklogScrollbar = defineObject(BaseScrollbar,
 		var srcHeight = destHeight;
 		var handle = this._getFaceResourceHandle(object.command);
 		var facialExpressionId = object.command.getFacialExpressionId();
+		var messageLayout = root.getDefaultMessageLayout(object.command.getCommandType());
 		
 		if (handle === null || root.isLargeFaceUse()) {
 			return;
@@ -922,7 +927,8 @@ var BacklogScrollbar = defineObject(BaseScrollbar,
 			return;
 		}
 		
-		if (facialExpressionId === 0) {
+		// Even in the backlog, refer to the "Enable Expression (Face)" in the message layout.
+		if (facialExpressionId === 0 || (messageLayout !== null && !messageLayout.isFacialExpressionEnabled())) {
 			xSrc = handle.getSrcX();
 			ySrc = handle.getSrcY();
 		}

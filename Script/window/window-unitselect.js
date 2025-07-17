@@ -234,16 +234,14 @@ var UnitSelectScrollbar = defineObject(BaseScrollbar,
 		var range;
 		var unit = object;
 		var unitRenderParam = StructureBuilder.buildUnitRenderParam();
-		var alpha = 255;
 		var dx = Math.floor((this.getObjectWidth() - GraphicsFormat.CHARCHIP_WIDTH) / 2) + 16;
 		var length = this._getTextLength();
 		var textui = this.getParentTextUI();
 		var color = textui.getColor();
 		var font = textui.getFont();
+		var alpha = this._getAlpha(unit, isSelect, index);
 		
-		if (this._selectableArray !== null && !this._selectableArray[index]) {
-			alpha = 128;
-		}
+		this._drawUnitHighlight(x, y, unit, isSelect);
 		
 		x += dx;
 		y += 10;
@@ -264,6 +262,22 @@ var UnitSelectScrollbar = defineObject(BaseScrollbar,
 	
 	setSelectableArray: function(arr) {
 		this._selectableArray = arr;
+	},
+	
+	_drawUnitHighlight: function(x, y, unit, isSelect) {
+		if (isSelect) {
+			// root.getGraphicsManager().fillRange(x, y, this.getObjectWidth(), this.getObjectHeight(), 0xffffff, 128);
+		}
+	},
+	
+	_getAlpha: function(unit, isSelect, index) {
+		var alpha = 255;
+		
+		if (this._selectableArray !== null && !this._selectableArray[index]) {
+			alpha = 128;
+		}
+		
+		return alpha;
 	},
 	
 	_getTextLength: function() {

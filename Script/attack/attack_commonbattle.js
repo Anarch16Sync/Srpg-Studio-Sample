@@ -96,6 +96,7 @@ var BaseBattleTable = defineObject(BaseObject,
 	
 	endMusic: function() {
 		if (this._isBattleStart && this._isMusicPlay) {
+			this._saveCurrentMusicTime();
 			MediaControl.musicStop(MusicStopType.BACK);
 		}
 		
@@ -112,6 +113,9 @@ var BaseBattleTable = defineObject(BaseObject,
 	},
 	
 	_pushFlowEntriesActionEnd: function(straightFlow) {
+	},
+	
+	_saveCurrentMusicTime: function() {
 	}
 }
 );
@@ -967,7 +971,7 @@ var BattleTransition = defineObject(BaseObject,
 	},
 	
 	_getScrollPixel: function() {
-		var d = 40;
+		var d = this._getBasePixel();
 	
 		if (!DataConfig.isHighPerformance()) {
 			d *= 2;
@@ -978,6 +982,10 @@ var BattleTransition = defineObject(BaseObject,
 		}
 		
 		return d;
+	},
+	
+	_getBasePixel: function() {
+		return 40;
 	},
 	
 	_getMargin: function() {
@@ -1034,10 +1042,12 @@ var BattleMusicControl = {
 				if (data.isNew) {
 					MediaControl.resetMusicList();
 					MediaControl.musicPlayNew(handle);
+					this._restorePreviousMusicTime(handle);
 					this._arrangeMapMusic(handle);
 				}
 				else if (isForce) {
 					MediaControl.musicPlay(handle);
+					this._restorePreviousMusicTime(handle);
 					isMusicPlay = true;
 				}
 			}
@@ -1094,5 +1104,8 @@ var BattleMusicControl = {
 		mapInfo.setPlayerBattleMusicHandle(handle);
 		mapInfo.setEnemyBattleMusicHandle(handle);
 		mapInfo.setAllyBattleMusicHandle(handle);
+	},
+	
+	_restorePreviousMusicTime: function() {
 	}
 };
