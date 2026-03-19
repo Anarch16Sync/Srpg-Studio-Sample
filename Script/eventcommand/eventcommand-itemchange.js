@@ -253,7 +253,7 @@ var ItemChangeNoticeView = defineObject(BaseNoticeView,
 		var infoColor = this._increaseType === IncreaseType.INCREASE ? ColorValue.KEYWORD : ColorValue.INFO;
 		var width = TextRenderer.getTextWidth(text, font) + 5;
 		
-		TextRenderer.drawKeywordText(x, y, text, -1, infoColor, font);
+		TextRenderer.drawKeywordText(x, y + this._getNoticeOffsetY(), text, -1, infoColor, font);
 		ItemRenderer.drawItem(x + width, y, this._targetItem, color, font, false);
 	},
 	
@@ -263,7 +263,7 @@ var ItemChangeNoticeView = defineObject(BaseNoticeView,
 	
 	_setTitlePartsCount: function() {
 		var font = this.getTitleTextUI().getFont();
-		var textWidth = TextRenderer.getTextWidth(this._targetItem.getName(), font) + 100 + (TitleRenderer.getTitlePartsWidth() * 2);
+		var textWidth = TextRenderer.getTextWidth(this._targetItem.getName(), font) + this._getNoticeInterval() + (TitleRenderer.getTitlePartsWidth() * 2);
 		
 		this._titlePartsCount = Math.floor(textWidth / TitleRenderer.getTitlePartsWidth());
 	},

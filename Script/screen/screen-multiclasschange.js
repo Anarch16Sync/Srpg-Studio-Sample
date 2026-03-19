@@ -357,18 +357,15 @@ var MultiClassInfoWindow = defineObject(BaseWindow,
 	},
 	
 	drawWindowContent: function(x, y) {
-		var textui = root.queryTextUI('decoration_title');
+		var textui = this._getTextUI();
 		var color = ColorValue.KEYWORD;
 		var font = textui.getFont();
 		var pic = textui.getUIImage();
 		
-		WeaponTypeRenderer.drawTitle(x + 220, y - 10, color, font, pic);
-		SkillRenderer.drawTitle(x + 220, y + 70, color, font, pic);
+		this._drawWeaponTypeList(x, y, color, font, pic);
+		this._drawSkillList(x, y, color, font, pic);
 		
 		if (this._isClassDraw) {
-			WeaponTypeRenderer.drawClassWeaponList(x + 220, y + 50, this._targetClass);
-			this._skillInteraction.getInteractionScrollbar().drawScrollbar(x + 220, y + 130);
-			
 			this._drawClassGraphics(x, y);
 		}
 		else {
@@ -458,22 +455,28 @@ var MultiClassInfoWindow = defineObject(BaseWindow,
 		this._skillInteraction.checkInitialTopic();
 	},
 	
-	_getTargetHandle: function() {
-		var xSrc, ySrc;
-		var handle = this._targetClass.getCharChipResourceHandle();
-		var isRuntime = handle.getHandleType() === ResourceHandleType.RUNTIME;
-		var id = handle.getResourceId();
-		var colorIndex = handle.getColorIndex();
+	_drawWeaponTypeList: function(x, y, color, font, pic) {
+		var pos = this._getWeaponTypeListPos();
 		
-		handle = this._unit.getCharChipResourceHandle();
-		xSrc = handle.getSrcX();
-		ySrc = handle.getSrcY();
+		x += pos.x;
+		y += pos.y;
 		
-		return root.createResourceHandle(isRuntime, id, colorIndex, xSrc, ySrc);
+		WeaponTypeRenderer.drawTitle(x, y, color, font, pic);
+		if (this._isClassDraw) {
+			WeaponTypeRenderer.drawClassWeaponList(x, y + 60, this._targetClass);
+		}
 	},
 	
-	_getMotionId: function() {
-		return MotionIdControl.getWaitId(this._unit, null);
+	_drawSkillList: function(x, y, color, font, pic) {
+		var pos = this._getSkillListPos();
+		
+		x += pos.x;
+		y += pos.y;
+		
+		SkillRenderer.drawTitle(x, y, color, font, pic);
+		if (this._isClassDraw) {
+			this._skillInteraction.getInteractionScrollbar().drawScrollbar(x, y + 60);
+		}
 	},
 	
 	_drawClassGraphics: function(x, y) {
@@ -525,6 +528,36 @@ var MultiClassInfoWindow = defineObject(BaseWindow,
 			animeCoordinates.yBase = y + 145 + dy;
 			this._animeSimple.drawMotion(frameIndex, i, this._animeRenderParam, animeCoordinates);
 		}
+	},
+	
+	_getTargetHandle: function() {
+		var xSrc, ySrc;
+		var handle = this._targetClass.getCharChipResourceHandle();
+		var isRuntime = handle.getHandleType() === ResourceHandleType.RUNTIME;
+		var id = handle.getResourceId();
+		var colorIndex = handle.getColorIndex();
+		
+		handle = this._unit.getCharChipResourceHandle();
+		xSrc = handle.getSrcX();
+		ySrc = handle.getSrcY();
+		
+		return root.createResourceHandle(isRuntime, id, colorIndex, xSrc, ySrc);
+	},
+	
+	_getMotionId: function() {
+		return MotionIdControl.getWaitId(this._unit, null);
+	},
+	
+	_getWeaponTypeListPos: function() {
+		return createPos(220, -10);
+	},
+	
+	_getSkillListPos: function() {
+		return createPos(220, 70);
+	},
+	
+	_getTextUI: function() {
+		return root.queryTextUI('decoration_title');
 	},
 	
 	_isDrawAllSpritesEnabled: function() {

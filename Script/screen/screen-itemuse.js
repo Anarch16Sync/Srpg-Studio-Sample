@@ -666,12 +666,16 @@ var ItemUserWindow = defineObject(BaseWindow,
 	},
 	
 	drawWindowContent: function(x, y) {
+		var pos;
+		
 		this._drawTop(x, y);
 		
-		this._statusScrollbar.drawScrollbar(x, y + 90);
+		pos = this._getStatusPos();
+		this._statusScrollbar.drawScrollbar(x + pos.x, y + pos.y);
 		
-		y = y + this.getWindowHeight() - 60;
-		this._skillInteraction.getInteractionScrollbar().drawScrollbar(x, y);
+		pos = this._getSkillListPos();
+		y = y + this.getWindowHeight() - pos.y;
+		this._skillInteraction.getInteractionScrollbar().drawScrollbar(x + pos.x, y);
 	},
 	
 	getWindowWidth: function() {
@@ -705,24 +709,40 @@ var ItemUserWindow = defineObject(BaseWindow,
 		var color = textui.getColor();
 		var font = textui.getFont();
 		var cls = this._unit.getClass();
-		var range = createRangeObject(xBase, yBase + 47, 120, 30);
+		var range = this._getClassRange(xBase, yBase);
 		
 		TextRenderer.drawRangeText(range, TextFormat.CENTER, cls.getName(), -1, color, font);
 	},
 	
 	_drawUnitLevel: function(xBase, yBase) {
-		var x = xBase + 127;
+		var x = xBase + 127 + this._getZoneStartX();
 		var y = yBase + 5;
 		
 		ContentRenderer.drawLevelInfo(x, y, this._unit);
 	},
 	
 	_drawUnitHp: function(xBase, yBase) {
-		var x = xBase + 127;
+		var x = xBase + 127 + this._getZoneStartX();
 		var y = yBase + 45;
 		var pic = root.queryUI('unit_gauge');
 		
 		ContentRenderer.drawUnitHpZone(x, y, this._unit, pic);
+	},
+	
+	_getZoneStartX: function() {
+		return 0;
+	},
+	
+	_getClassRange: function(xBase, yBase) {
+		return createRangeObject(xBase, yBase + 47, 120, 30);
+	},
+	
+	_getStatusPos: function() {
+		return createPos(0, 90);
+	},
+	
+	_getSkillListPos: function() {
+		return createPos(0, 60);
 	}
 }
 );

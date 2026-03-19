@@ -2,7 +2,6 @@
 var MessageTitleEventCommand = defineObject(BaseEventCommand,
 {
 	_text: null,
-	_textWidth: 0,
 	_partsCount: 0,
 	_partsWidth: 0,
 	_partsHeight: 0,
@@ -44,7 +43,7 @@ var MessageTitleEventCommand = defineObject(BaseEventCommand,
 			y = this._yStart;
 		}
 		
-		TextRenderer.drawTitleText(x, y, this._text, color, font, TextFormat.CENTER, pic);
+		TextRenderer.drawFixedTitleText(x, y, this._text, color, font, TextFormat.CENTER, pic, this._partsCount);
 	},
 	
 	_prepareEventCommandMemberData: function() {
@@ -53,8 +52,7 @@ var MessageTitleEventCommand = defineObject(BaseEventCommand,
 		var font = textui.getFont();
 		
 		this._text = eventCommandData.getText();
-		this._textWidth = TextRenderer.getTextWidth(this._text, font);
-		this._partsCount = TitleRenderer.getTitlePartsCount(this._text, font);
+		this._partsCount = this._getTitlePartsCount(this._text, font);
 		this._partsWidth = TitleRenderer.getTitlePartsWidth();
 		this._partsHeight = TitleRenderer.getTitlePartsHeight();
 		
@@ -89,6 +87,10 @@ var MessageTitleEventCommand = defineObject(BaseEventCommand,
 		y -= Math.floor(this._partsHeight / 2);
 		
 		return createPos(x, y);
+	},
+	
+	_getTitlePartsCount: function(text, font) {
+		return TitleRenderer.getTitlePartsCount(text, font);
 	},
 	
 	_getTitleText: function() {

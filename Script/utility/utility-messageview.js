@@ -755,7 +755,7 @@ var BacklogWindow = defineObject(BaseWindow,
 			for (j = 0; j < count2; j++) {
 				if ((j % 3) === 0) {
 					object = {};
-					object.command = command;
+					object.backlogCommand = command;
 					object.textArray = [];
 					object.voiceName = '';
 					this._scrollbar.objectSet(object);
@@ -881,9 +881,9 @@ var BacklogScrollbar = defineObject(BaseScrollbar,
 	_drawName: function(xDest, yDest, object) {
 		var range;
 		var textui = this._getNameTextUI();
-		var color = this._getNameColor(object.command, textui);
+		var color = this._getNameColor(object.backlogCommand, textui);
 		var font = textui.getFont();
-		var name = this._getNameText(object.command);
+		var name = this._getNameText(object.backlogCommand);
 		
 		if (!root.isLargeFaceUse()) {
 			return;
@@ -914,9 +914,9 @@ var BacklogScrollbar = defineObject(BaseScrollbar,
 		var destHeight = 67;
 		var srcWidth = destWidth;
 		var srcHeight = destHeight;
-		var handle = this._getFaceResourceHandle(object.command);
-		var facialExpressionId = object.command.getFacialExpressionId();
-		var messageLayout = root.getDefaultMessageLayout(object.command.getCommandType());
+		var handle = this._getFaceResourceHandle(object.backlogCommand);
+		var facialExpressionId = object.backlogCommand.getFacialExpressionId();
+		var messageLayout = root.getDefaultMessageLayout(object.backlogCommand.getCommandType());
 		
 		if (handle === null || root.isLargeFaceUse()) {
 			return;

@@ -520,13 +520,16 @@ var BaseQuestSentence = defineObject(BaseObject,
 	},
 	
 	_drawNumberAndText: function(x, y, text, number, colorIndex) {
+		var pos;
 		var textui = this._getSentenceTextUI();
 		var color = textui.getColor();
 		var font = textui.getFont();
 		
-		y += 19;
-		TextRenderer.drawKeywordText(x + 8, y + 0, text, -1, color, font);
-		NumberRenderer.drawNumberColor(x + this._getNumberSpace(), y + 0, number, colorIndex, 255);
+		pos = this._getTextPos();
+		TextRenderer.drawKeywordText(x + pos.x, y + pos.y, text, -1, color, font);
+		
+		pos = this._getNumberPos();
+		NumberRenderer.drawNumberColor(x + this._getNumberSpace() + pos.x, y + pos.y, number, colorIndex, 255);
 	},
 	
 	_drawTitle: function(x, y) {
@@ -548,6 +551,14 @@ var BaseQuestSentence = defineObject(BaseObject,
 	
 	_getNumberSpace: function() {
 		return 186;
+	},
+	
+	_getTextPos: function() {
+		return createPos(8, 19);
+	},
+	
+	_getNumberPos: function() {
+		return createPos(0, 19);
 	}
 }
 );

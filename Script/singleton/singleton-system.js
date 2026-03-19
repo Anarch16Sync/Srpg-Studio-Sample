@@ -179,12 +179,19 @@ var Probability = {
 	},
 	
 	getInvocationPercent: function(unit, type, value) {
-		var n, hp, percent;
+		var n, hp, percent, maxMhp;
 		
 		if (type === InvocationType.HPDOWN) {
-			n = value / 100;
-			hp = ParamBonus.getMhp(unit) * n;
-			percent = unit.getHp() <= hp ? 100 : 0;
+			maxMhp = ParamBonus.getMhp(unit);
+			// If "HP Drop Rate" is 0, the skill will be activated if HP is full.
+			if (value === 0 && unit.getHp() === maxMhp) {
+				percent = 100;
+			}
+			else {
+				n = value / 100;
+				hp = maxMhp * n;
+				percent = unit.getHp() <= hp ? 100 : 0;
+			}
 		}
 		else if (type === InvocationType.ABSOLUTE) {
 			percent = value;

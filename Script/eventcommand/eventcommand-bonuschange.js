@@ -120,10 +120,11 @@ var BonusChangeNoticeView = defineObject(BaseNoticeView,
 		var infoColor = this._bonus > 0 ? ColorValue.KEYWORD : ColorValue.INFO;
 		var n = this._balancer.getCurrentValue();
 		var width = TextRenderer.getTextWidth(text, font) + 5;
+		var dy = this._getNoticeOffsetY();
 		
-		TextRenderer.drawKeywordText(x, y, text, -1, infoColor, font);
-		TextRenderer.drawKeywordText(x + width, y, this._bonus > 0 ? '+' : '-', -1, color, font);
-		NumberRenderer.drawRightNumber(x + width + 10, y, n);
+		TextRenderer.drawKeywordText(x, y + dy, text, -1, infoColor, font);
+		TextRenderer.drawKeywordText(x + width, y + dy, this._bonus > 0 ? '+' : '-', -1, color, font);
+		NumberRenderer.drawRightNumber(x + width + this._getBonusInterval(), y + dy, n);
 	},
 	
 	_moveWait: function() {
@@ -151,8 +152,13 @@ var BonusChangeNoticeView = defineObject(BaseNoticeView,
 		return MoveResult.CONTINUE;
 	},
 	
+	_getBonusInterval: function() {
+		return 10;
+	},
+	
 	_playBonusChangeSound: function() {
 		MediaControl.soundDirect('itemsale');
 	}
 }
 );
+

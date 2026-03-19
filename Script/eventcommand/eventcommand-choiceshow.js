@@ -197,16 +197,7 @@ var SelectScrollbar = defineObject(BaseScrollbar,
 	},
 	
 	_getCount: function() {
-		var count;
-		
-		if (this.getParentInstance().isTwoLines()) {
-			count = 6;
-		}
-		else {
-			count = 12;
-		}
-		
-		return count;
+		return this.getParentInstance().isTwoLines() ? 6 : 12;
 	},
 	
 	_getHighlightColor: function() {

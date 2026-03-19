@@ -197,7 +197,7 @@ var BaseWindow = defineObject(BaseObject,
 	
 	drawWindowTitle: function(x, y, width, height) {
 		var color, font, pic, titleWidth, dx;
-		var titleCount = 3;
+		var titlePartsCount = this._getWindowTitlePartsCount();
 		var textui = this.getWindowTitleTextUI();
 		var text = this.getWindowTitleText();
 		
@@ -208,9 +208,9 @@ var BaseWindow = defineObject(BaseObject,
 		color = textui.getColor();
 		font = textui.getFont();
 		pic = textui.getUIImage();
-		titleWidth = TitleRenderer.getTitlePartsWidth() * (titleCount + 2);
+		titleWidth = TitleRenderer.getTitlePartsWidth() * (titlePartsCount + 2);
 		dx = Math.floor((width - titleWidth) / 2);
-		TextRenderer.drawFixedTitleText(x + dx, y - 40, text, color, font, TextFormat.CENTER, pic, titleCount);
+		TextRenderer.drawFixedTitleText(x + dx, y - 40, text, color, font, TextFormat.CENTER, pic, titlePartsCount);
 	},
 	
 	getWindowTextUI: function() {
@@ -260,6 +260,10 @@ var BaseWindow = defineObject(BaseObject,
 		if (pic !== null) {
 			WindowRenderer.drawStretchWindow(x, y, width, height, pic);
 		}
+	},
+	
+	_getWindowTitlePartsCount: function() {
+		return 3;
 	}
 }
 );
@@ -313,8 +317,8 @@ var BaseNoticeView = defineObject(BaseObject,
 		
 		TitleRenderer.drawTitle(pic, x, y, width, height, count);
 		
-		x += 30;
-		y += 18;
+		x += this._getNoticeStartX();
+		y += this._getNoticeStartY();
 		this.drawNoticeViewContent(x, y);
 	},
 	
@@ -335,6 +339,22 @@ var BaseNoticeView = defineObject(BaseObject,
 	
 	getTitlePartsCount: function() {
 		return 6;
+	},
+	
+	_getNoticeInterval: function() {
+		return 100;
+	},
+	
+	_getNoticeStartX: function() {
+		return 30;
+	},
+	
+	_getNoticeStartY: function() {
+		return 18;
+	},
+	
+	_getNoticeOffsetY: function() {
+		return 0;
 	}
 }
 );

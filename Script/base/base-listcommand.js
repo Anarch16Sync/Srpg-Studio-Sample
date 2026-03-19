@@ -11,7 +11,7 @@ var BaseListCommandManager = defineObject(BaseObject,
 	_currentTarget: null,
 	
 	openListCommandManager: function() {
-		this._commandScrollbar = createScrollbarObject(ListCommandScrollbar, this);
+		this._commandScrollbar = this._createListCommandScrollbar();
 		this._commandScrollbar.setActive(true);
 		this.rebuildCommand();
 		this._playCommandOpenSound();
@@ -101,6 +101,10 @@ var BaseListCommandManager = defineObject(BaseObject,
 	
 	getCommandScrollbar: function() {
 		return this._commandScrollbar;
+	},
+	
+	_createListCommandScrollbar: function() {
+		return createScrollbarObject(ListCommandScrollbar, this);
 	},
 	
 	_moveTitle: function() {

@@ -185,6 +185,14 @@ var DataSaveScreen = defineObject(LoadSaveScreen,
 }
 );
 
+var LoadSaveScrollbarContent = {
+	CHAPTER: 1,
+	PLAYTIME: 2,
+	TURNNO: 3,
+	DIFFICULTY: 4,
+	FILETITLE: 5
+};
+
 var LoadSaveScrollbar = defineObject(BaseScrollbar,
 {
 	_isLoadMode: false,
@@ -281,7 +289,8 @@ var LoadSaveScrollbar = defineObject(BaseScrollbar,
 		var length = this._getTextLength();
 		var textui = this._getWindowTextUI();
 		var font = textui.getFont();
-		var x = xBase + 80;
+		var obj = this._getPositionObject(LoadSaveScrollbarContent.CHAPTER);
+		var x = xBase + obj.dx;
 		var y = yBase;
 		
 		if (object.isCompleteFile()) {
@@ -295,8 +304,9 @@ var LoadSaveScrollbar = defineObject(BaseScrollbar,
 	},
 	
 	_drawPlayTime: function(xBase, yBase, object) {
+		var obj = this._getPositionObject(LoadSaveScrollbarContent.PLAYTIME);
 		var x = xBase;
-		var y = yBase + 25;
+		var y = yBase + obj.dx;
 		
 		ContentRenderer.drawPlayTime(x, y, object.getPlayTime());
 	},
@@ -307,8 +317,9 @@ var LoadSaveScrollbar = defineObject(BaseScrollbar,
 		var font = textui.getFont();
 		var text = StringTable.Signal_Turn;
 		var turn = object.getTurnCount();
-		var x = xBase + 80;
-		var y = yBase + 25;
+		var obj = this._getPositionObject(LoadSaveScrollbarContent.TURNNO);
+		var x = xBase + obj.dx;
+		var y = yBase + obj.dy;
 		
 		if (turn > 0) {
 			TextRenderer.drawKeywordText(x, y, text, -1, ColorValue.INFO, font);
@@ -322,9 +333,11 @@ var LoadSaveScrollbar = defineObject(BaseScrollbar,
 	
 	_drawDifficulty: function(xBase, yBase, object) {
 		var difficulty = object.getDifficulty();
-		var x = xBase + 200;
-		var y = yBase + 23;
+		var obj = this._getPositionObject(LoadSaveScrollbarContent.DIFFICULTY);
+		var x = xBase + obj.dx;
+		var y = yBase + obj.dy;
 		
+		// // Prevent the difficulty icons from being hidden in 640×480 thumbnail mode.
 		if (this.getCol() === 1 && !DataConfig.isHighResolution()) {
 			x -= 34;
 			y -= 2;
@@ -356,9 +369,10 @@ var LoadSaveScrollbar = defineObject(BaseScrollbar,
 	
 	_drawFileTitle: function(xBase, yBase, index) {
 		var textui = this._getTitleTextUI();
+		var obj = this._getPositionObject(LoadSaveScrollbarContent.FILETITLE);
 		var x = xBase;
 		var y = yBase - 42;
-		var width = this.getObjectWidth() - 85;
+		var width = this.getObjectWidth() - obj.width;
 		var n = index + 1;
 		var dx = n >= 10 ? 56 : 51;
 		
@@ -367,7 +381,33 @@ var LoadSaveScrollbar = defineObject(BaseScrollbar,
 		}
 		
 		TitleRenderer.drawTitle(textui.getUIImage(), x + width, y, TitleRenderer.getTitlePartsWidth(), TitleRenderer.getTitlePartsHeight(), 1);
-		NumberRenderer.drawNumberColor(x + width + dx, y + 17, n, this._getNumberColorIndex(), 255);
+		NumberRenderer.drawNumberColor(x + width + dx + obj.dx, y + obj.dy, n, this._getNumberColorIndex(), 255);
+	},
+	
+	_getPositionObject: function(index) {
+		var obj = {};
+		
+		if (index === LoadSaveScrollbarContent.CHAPTER) {
+			obj.dx = 80;
+		}
+		else if (index === LoadSaveScrollbarContent.PLAYTIME) {
+			obj.dx = 25;
+		}
+		else if (index === LoadSaveScrollbarContent.TURNNO) {
+			obj.dx = 80;
+			obj.dy = 25;
+		}
+		else if (index === LoadSaveScrollbarContent.DIFFICULTY) {
+			obj.dx = 200;
+			obj.dy = 23;
+		}
+		else if (index === LoadSaveScrollbarContent.FILETITLE) {
+			obj.width = 85;
+			obj.dx = 0;
+			obj.dy = 17;
+		}
+		
+		return obj;
 	},
 	
 	_getTextLength: function() {
@@ -893,32 +933,57 @@ LoadSaveSentence.Leader = defineObject(BaseLoadSaveSentence,
 	},
 	
 	drawLoadSaveSentence: function(x, y) {
-		var unitRenderParam;
-		var textui = this._getSentenceTextUI();
-		var color = textui.getColor();
-		var font = textui.getFont();
 		var obj = this._saveFileInfo.custom;
-		var length = 130;
 		
 		this._drawTitle(x, y);
+		this._drawLeaderCharChip(x, y, obj);
+		this._drawLeaderName(x, y, obj);
+		this._drawLevel(x, y, obj);
+	},
+	
+	_drawLeaderCharChip: function(x, y, obj) {
+		var unitRenderParam;
 		
 		if (typeof obj.binary !== 'undefined') {
 			unitRenderParam = StructureBuilder.buildUnitRenderParam();
 			unitRenderParam.handle = deserializeResourceHandle(obj.binary);
 			unitRenderParam.colorIndex = 0;
-			UnitRenderer.drawCharChip(x + 24, y + 8, unitRenderParam);
+			UnitRenderer.drawCharChip(x + this._getLeaderOffsetX(), y + this._getLeaderOffsetY() - 10, unitRenderParam);
 		}
+	},
+	
+	_drawLeaderName: function(x, y, obj) {
+		var textui = this._getSentenceTextUI();
+		var color = textui.getColor();
+		var font = textui.getFont();
+		var dy = this._getLeaderOffsetY();
+		var length = 130;
 		
 		if (typeof obj.leaderName !== 'undefined') {
 			length += this._detailWindow.isSentenceLong() ? 20 : 0;
-			TextRenderer.drawKeywordText(x + 70, y + 18, obj.leaderName, length, color, font);
+			TextRenderer.drawKeywordText(x + 70, y + this._getLeaderOffsetY(), obj.leaderName, length, color, font);
 		}
+	},
+	
+	_drawLevel: function(x, y, obj) {
+		var textui = this._getSentenceTextUI();
+		var color = textui.getColor();
+		var font = textui.getFont();
+		var dy = this._getLeaderOffsetY();
 		
 		if (typeof obj.leaderLv !== 'undefined') {
 			x += this._detailWindow.isSentenceLong() ? 20 : 0;
-			TextRenderer.drawKeywordText(x + 180, y + 18, 'Lv', -1, color, font);
-			NumberRenderer.drawNumber(x + 210, y + 18, obj.leaderLv);
+			TextRenderer.drawKeywordText(x + 180, y + dy, 'Lv', -1, color, font);
+			NumberRenderer.drawNumber(x + 210, y + dy, obj.leaderLv);
 		}
+	},
+	
+	_getLeaderOffsetX: function() {
+		return 24;
+	},
+	
+	_getLeaderOffsetY: function() {
+		return 18;
 	}
 }
 );
@@ -932,32 +997,52 @@ LoadSaveSentence.Time = defineObject(BaseLoadSaveSentence,
 	},
 	
 	drawLoadSaveSentence: function(x, y) {
+		this._drawTitle(x, y);
+		this._drawTurn(x, y);
+		this._drawTimeText(x, y);
+		this._drawTimeNumber(x, y);
+	},
+	
+	_drawTurn: function(x, y) {
 		var dx, n;
+		
+		if (this._saveFileInfo.getSceneType() !== SceneType.FREE) {
+			return;
+		}
+		
+		n = this._saveFileInfo.getTurnCount();
+		if (n >= 100) {
+			dx = 18;
+		}
+		else if (n >= 10) {
+			dx = 24;
+		}
+		else {
+			dx = 30;
+		}
+		
+		NumberRenderer.drawAttackNumberColor(x + dx, y + this._getTimeOffsetY() + this._getTurnOffsetY(), n, 1, 255);
+	},
+	
+	_drawTimeText: function(x, y) {
 		var textui = this._getSentenceTextUI();
 		var color = textui.getColor();
 		var font = textui.getFont();
-		var difficulty = this._saveFileInfo.getDifficulty();
 		
-		this._drawTitle(x, y);
-		
-		if (this._saveFileInfo.getSceneType() === SceneType.FREE) {
-			n = this._saveFileInfo.getTurnCount();
-			if (n >= 100) {
-				dx = 18;
-			}
-			else if (n >= 10) {
-				dx = 24;
-			}
-			else {
-				dx = 30;
-			}
-			NumberRenderer.drawAttackNumberColor(x + dx, y + 18, n, 1, 255);
-		}
-		
-		TextRenderer.drawKeywordText(x + 70, y + 18, StringTable.PlayTime, -1, color, font);
-		
+		TextRenderer.drawKeywordText(x + 70, y + this._getTimeOffsetY(), StringTable.PlayTime, -1, color, font);
+	},
+	
+	_drawTimeNumber: function(x, y) {
 		x += this._detailWindow.isSentenceLong() ? 20 : 0;
-		ContentRenderer.drawPlayTime(x + 180, y + 18, this._saveFileInfo.getPlayTime());
+		ContentRenderer.drawPlayTime(x + 180, y + this._getTimeOffsetY(), this._saveFileInfo.getPlayTime());
+	},
+	
+	_getTimeOffsetY: function() {
+		return 18;
+	},
+	
+	_getTurnOffsetY: function() {
+		return 0;
 	}
 }
 );

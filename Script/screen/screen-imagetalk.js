@@ -64,7 +64,7 @@ var ImageTalkScreen = defineObject(BaseScreen,
 	},
 	
 	_drawTalkImage: function() {
-		var info, x, y, pos;
+		var info, x, y, messagePos;
 		var image = null;
 		var entry = this._imageTalkWindow.getChildScrollbar().getObject();
 		
@@ -80,11 +80,11 @@ var ImageTalkScreen = defineObject(BaseScreen,
 		
 		x = this._getIllustX(image);
 		
-		pos = info.getPos();
-		if (pos === MessagePos.TOP) {
+		messagePos = info.getPos();
+		if (messagePos === MessagePos.TOP) {
 			y = this._getIllustTopY(image);
 		}
-		else if (pos === MessagePos.CENTER) {
+		else if (messagePos === MessagePos.CENTER) {
 			y = this._getIllustCenterY(image);
 		}
 		else {

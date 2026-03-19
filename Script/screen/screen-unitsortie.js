@@ -246,9 +246,13 @@ var UnitSortieScreen = defineObject(BaseScreen,
 		var width = this._leftWindow.getWindowWidth() + this._unitMenuTopWindow.getWindowWidth();
 		
 		x = (x + width) - ((this._getTitlePartsCount() + 2) * TitleRenderer.getTitlePartsWidth());
-		y = y - 42;
+		y = y - this._getTitleRangeOffsetY();
 		
 		return createRangeObject(x, y, TitleRenderer.getTitlePartsWidth() * 5, TitleRenderer.getTitlePartsHeight());
+	},
+	
+	_getTitleRangeOffsetY: function() {
+		return 42;
 	},
 	
 	_getTitlePartsCount: function() {

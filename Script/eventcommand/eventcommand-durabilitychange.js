@@ -230,7 +230,7 @@ var DurabilityChangeNoticeView = defineObject(BaseNoticeView,
 	
 	_setTitlePartsCount: function() {
 		var font = this.getTitleTextUI().getFont();
-		var textWidth = TextRenderer.getTextWidth(this._targetItem.getName(), font) + 100 + (TitleRenderer.getTitlePartsWidth() * 2);
+		var textWidth = TextRenderer.getTextWidth(this._targetItem.getName(), font) + this._getNoticeInterval() + (TitleRenderer.getTitlePartsWidth() * 2);
 		
 		this._titlePartsCount = Math.floor(textWidth / TitleRenderer.getTitlePartsWidth());
 	},
@@ -264,14 +264,19 @@ var DurabilityChangeNoticeView = defineObject(BaseNoticeView,
 		var balancer = this._balancer;
 		var textSlash = '/';
 		var dx = this._getHorizontalSpaceArray();
+		var dy = this._getNoticeOffsetY();
 		
-		NumberRenderer.drawNumberColor(x + dx[0], y, balancer.getCurrentValue(), 1, 255);
-		TextRenderer.drawSignText(x + dx[1], y, textSlash);
-		NumberRenderer.drawNumber(x + dx[2], y, balancer.getMaxValue());
+		NumberRenderer.drawNumberColor(x + dx[0], y + dy, balancer.getCurrentValue(), this._getDefaultColorIndex(), 255);
+		TextRenderer.drawSignText(x + dx[1], y + dy, textSlash);
+		NumberRenderer.drawNumber(x + dx[2], y + dy, balancer.getMaxValue());
 	},
 	
 	_getHorizontalSpaceArray: function() {
 		return [44, 60, 98];
+	},
+	
+	_getDefaultColorIndex: function() {
+		return 1;
 	},
 	
 	_playDurabilityChangeSound: function() {

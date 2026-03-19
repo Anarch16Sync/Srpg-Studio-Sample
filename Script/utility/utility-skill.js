@@ -371,11 +371,12 @@ var TextCustomEffect = defineObject(BaseCustomEffect,
 		var pic = textui.getUIImage();
 		var width = TitleRenderer.getTitlePartsWidth();
 		var height = TitleRenderer.getTitlePartsHeight();
+		var pos = this._getAreaSkillPos();
 		
 		for (i = 0; i < count; i++) {
 			TitleRenderer.drawTitleNoCache(pic, x, y, width, height, this._getTitlePartsCount(skillArray[i], font));
-			SkillRenderer.drawSkill(x + 42, y + 18, skillArray[i], color, font);
-			y += 40;
+			SkillRenderer.drawSkill(x + pos.x, y + pos.y, skillArray[i], color, font);
+			y += this._getAreaTitleVerticalInterval();
 		}
 	},
 	
@@ -427,6 +428,14 @@ var TextCustomEffect = defineObject(BaseCustomEffect,
 	
 	_getWidth: function() {
 		return 190;
+	},
+	
+	_getAreaSkillPos: function() {
+		return createPos(42, 18);
+	},
+	
+	_getAreaTitleVerticalInterval: function() {
+		return 40;
 	},
 	
 	_getWindowTextUI: function(unit) {

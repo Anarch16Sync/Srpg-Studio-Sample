@@ -120,10 +120,11 @@ var GoldChangeNoticeView = defineObject(BaseNoticeView,
 		var infoColor = this._gold > 0 ? ColorValue.KEYWORD : ColorValue.INFO;
 		var n = this._balancer.getCurrentValue();
 		var width = TextRenderer.getTextWidth(text, font) + 5;
+		var dy = this._getNoticeOffsetY();
 		
-		TextRenderer.drawKeywordText(x, y, text, -1, infoColor, font);
-		TextRenderer.drawKeywordText(x + width, y, this._gold > 0 ? '+' : '-', -1, color, font);
-		NumberRenderer.drawRightNumber(x + width + 10, y, n);
+		TextRenderer.drawKeywordText(x, y + dy, text, -1, infoColor, font);
+		TextRenderer.drawKeywordText(x + width, y + dy, this._gold > 0 ? '+' : '-', -1, color, font);
+		NumberRenderer.drawRightNumber(x + width + this._getGoldInterval(), y + dy, n);
 	},
 	
 	_moveWait: function() {
@@ -151,8 +152,13 @@ var GoldChangeNoticeView = defineObject(BaseNoticeView,
 		return MoveResult.CONTINUE;
 	},
 	
+	_getGoldInterval: function() {
+		return 10;
+	},
+	
 	_playGoldChangeSound: function() {
 		MediaControl.soundDirect('itemsale');
 	}
 }
 );
+

@@ -577,40 +577,16 @@ var ItemRenderer = {
 	},
 	
 	drawAmount: function(x, y, item, color, font, amount) {
-		var width, height;
-		var dx = 0;
-		var textui = root.queryTextUI('inventory_title');
-		var pic = textui.getUIImage();
-		
-		if (amount === 0) {
-			return;
-		}
-		
-		if (pic === null) {
-			dx = 36;
-			TextRenderer.drawSignText(x + dx, y, StringTable.SignWord_Multiple);
-			NumberRenderer.drawRightNumberColor(x + dx + 16, y, amount, 1, 255);
-		}
-		else {
-			width = TitleRenderer.getTitlePartsWidth();
-			height = TitleRenderer.getTitlePartsHeight();
-			
-			TitleRenderer.drawTitle(pic, x + dx, y - 20, width, height, 1);
-			if (amount >= 10) {
-				dx += 42;
-			}
-			else {
-				dx += 46;
-			}
-			NumberRenderer.drawRightNumberColor(x + dx, y - 2, amount, 4, 255);
-		}
+		InventoryRenderer.drawAmount(x, y, item, color, font, amount);
 	},
 	
 	drawShopItem: function(x, y, item, color, font, gold, amount) {
-		ItemRenderer.drawItem(x, y, item, color, font, false);
-		this.drawAmount(x + 140, y, item, color, font, amount);
-		ItemRenderer.drawItemLimit(x + 225, y, item, 255);
-		NumberRenderer.drawNumber(x + 285, y, gold);
+		var dx = this._getHorizontalSpaceArray();
+		
+		ItemRenderer.drawItem(x + dx[0], y, item, color, font, false);
+		this.drawAmount(x + dx[1], y, item, color, font, amount);
+		ItemRenderer.drawItemLimit(x + dx[2], y, item, 255);
+		NumberRenderer.drawNumber(x + dx[3], y, gold);
 	},
 	
 	getItemWidth: function() {
@@ -641,8 +617,55 @@ var ItemRenderer = {
 		return this.getItemWidth() - 15;
 	},
 	
+	_getHorizontalSpaceArray: function() {
+		return [0, 140, 225, 285];
+	},
+	
 	_isInfinity: function(item) {
 		return item.isWeapon() && DataConfig.isWeaponInfinity();
+	}
+};
+
+var InventoryRenderer = {
+	drawAmount: function(x, y, item, color, font, amount) {
+		var width, height;
+		var dx = 0;
+		var arr = this._getVerticalSpaceArray();
+		var textui = this._getTextUI();
+		var pic = textui.getUIImage();
+		
+		if (amount === 0) {
+			return;
+		}
+		
+		if (pic === null) {
+			dx = 36;
+			TextRenderer.drawSignText(x + dx, y, StringTable.SignWord_Multiple);
+			NumberRenderer.drawRightNumberColor(x + dx + 16, y, amount, 1, 255);
+		}
+		else {
+			width = TitleRenderer.getTitlePartsWidth();
+			height = TitleRenderer.getTitlePartsHeight();
+			
+			TitleRenderer.drawTitle(pic, x + dx, y + arr[0], width, height, 1);
+			NumberRenderer.drawRightNumberColor(x + dx + this._getAmountStartX(amount), y + arr[1], amount, this._getDefaultColorIndex(), 255);
+		}
+	},
+	
+	_getVerticalSpaceArray: function() {
+		return [-20, -2];
+	},
+	
+	_getAmountStartX: function(amount) {
+		return amount >= 10 ? 42 : 46;
+	},
+	
+	_getDefaultColorIndex: function() {
+		return 4;
+	},
+	
+	_getTextUI: function() {
+		return root.queryTextUI('inventory_title');
 	}
 };
 
@@ -1157,7 +1180,7 @@ var SkillRenderer = {
 		var length = this._getTextLength();
 		
 		GraphicsRenderer.drawImage(x, y, handle, GraphicsType.ICON);
-		x += 30;
+		x += GraphicsFormat.ICON_WIDTH + 6;
 		
 		TextRenderer.drawKeywordText(x, y, skill.getName(), length, color, font);
 	},

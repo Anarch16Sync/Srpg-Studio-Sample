@@ -460,6 +460,7 @@ var ExperienceNumberView = defineObject(BaseObject,
 	},
 	
 	_drawExp: function(x, y) {
+		var pos;
 		var textui = this._getTitleTextUI();
 		var color = textui.getColor();
 		var font = textui.getFont();
@@ -471,10 +472,11 @@ var ExperienceNumberView = defineObject(BaseObject,
 		
 		TitleRenderer.drawTitle(pic, x, y, width, height, count);
 		
-		x += 55;
-		y += 18;
-		NumberRenderer.drawAttackNumber(x, y, exp);
-		TextRenderer.drawText(x + 75, y + 5, StringTable.GetTitle_ExperiencePlus, -1, color, font);
+		pos = this._getExpPos();
+		NumberRenderer.drawAttackNumber(x + pos.x, y + pos.y, exp);
+		
+		pos = this._getTextPos();
+		TextRenderer.drawText(x + pos.x, y + pos.y, StringTable.GetTitle_ExperiencePlus, -1, color, font);
 	},
 	
 	_getTitleTextUI: function() {
@@ -485,6 +487,14 @@ var ExperienceNumberView = defineObject(BaseObject,
 		return 6;
 	},
 	
+	_getExpPos: function() {
+		return createPos(55, 18);
+	},
+	
+	_getTextPos: function() {
+		return createPos(130, 23);
+	},
+
 	_playNumberCount: function() {
 		if (this._counter.moveCycleCounter() !== MoveResult.CONTINUE) {
 			MediaControl.soundDirect('numbercount');

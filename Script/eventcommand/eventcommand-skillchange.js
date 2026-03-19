@@ -99,7 +99,7 @@ var SkillChangeNoticeView = defineObject(BaseNoticeView,
 		}
 		width = TextRenderer.getTextWidth(text, font) + 5;
 		
-		TextRenderer.drawKeywordText(x, y, text, -1, infoColor, font);
+		TextRenderer.drawKeywordText(x, y + this._getNoticeOffsetY(), text, -1, infoColor, font);
 		SkillRenderer.drawSkill(x + width, y, this._targetSkill, color, font);
 	},
 	
@@ -109,7 +109,7 @@ var SkillChangeNoticeView = defineObject(BaseNoticeView,
 	
 	_setTitlePartsCount: function() {
 		var font = this.getTitleTextUI().getFont();
-		var textWidth = TextRenderer.getTextWidth(this._targetSkill.getName(), font) + 100 + (TitleRenderer.getTitlePartsWidth() * 2);
+		var textWidth = TextRenderer.getTextWidth(this._targetSkill.getName(), font) + this._getNoticeInterval() + (TitleRenderer.getTitlePartsWidth() * 2);
 		
 		this._titlePartsCount = Math.floor(textWidth / TitleRenderer.getTitlePartsWidth());
 	},
