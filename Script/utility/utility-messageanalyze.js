@@ -164,12 +164,16 @@ var MessageAnalyzer = defineObject(BaseObject,
 		// Process the current page.
 		this._checkCurrentPage(false);
 		
-		// If it's 30FPS, process by each 2 characters.
-		if (!DataConfig.isHighPerformance()) {
+		if (this._isDoubleStep()) {
 			this._checkCurrentPage(false);
 		}
 		
 		return MoveResult.CONTINUE;
+	},
+	
+	_isDoubleStep: function() {
+		// If it's 30FPS, process by each 2 characters.
+		return !DataConfig.isHighPerformance();
 	},
 	
 	_moveCancel: function() {

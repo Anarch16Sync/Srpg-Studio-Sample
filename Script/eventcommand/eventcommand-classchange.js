@@ -67,7 +67,7 @@ var ClassChangeEventCommand = defineObject(BaseEventCommand,
 	},
 	
 	_completeEventCommandMemberData: function() {
-		this._startHpRecoveryAnime();
+		this._startClassChangeAnime();
 		this.changeCycleMode(ClassChangeMode.ANIME);
 		
 		return EnterResult.OK;
@@ -86,7 +86,7 @@ var ClassChangeEventCommand = defineObject(BaseEventCommand,
 		this._dynamicAnime.drawDynamicAnime();
 	},
 	
-	_startHpRecoveryAnime: function() {
+	_startClassChangeAnime: function() {
 		var x, y, size, pos;
 		var anime = root.queryAnime('classchange');
 		

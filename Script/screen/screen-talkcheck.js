@@ -87,6 +87,9 @@ var TalkCheckWindow = defineObject(BaseWindow,
 	
 	_setTalkEventList: function() {
 		var i, event;
+		// Since there may be talk events that can be referenced from any map,
+		// use EventCommonArray.createArray, which can include map common events,
+		// instead of root.getCurrentSession().getTalkEventList(), which targets only that map.
 		var arr = EventCommonArray.createArray(root.getCurrentSession().getTalkEventList(), EventType.TALK);
 		var count = arr.length;
 		

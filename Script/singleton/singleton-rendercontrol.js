@@ -986,13 +986,13 @@ var StatusRenderer = {
 	drawAttackStatus: function(x, y, arr, color, font, space) {
 		var i, text;
 		var length = this._getTextLength();
-		var numberSpace = DefineControl.getNumberSpace();
+		var numberSpace = this._getNumberSpace();
 		var buf = ['attack_capacity', 'hit_capacity', 'critical_capacity'];
 		
 		for (i = 0; i < 3; i++) {
 			text = root.queryCommand(buf[i]);
 			TextRenderer.drawKeywordText(x, y, text, length, color, font);
-			x += 28 + numberSpace;
+			x += numberSpace;
 			
 			if (arr[i] >= 0) {
 				NumberRenderer.drawNumber(x, y, arr[i]);
@@ -1003,6 +1003,10 @@ var StatusRenderer = {
 			
 			x += space;
 		}
+	},
+	
+	_getNumberSpace: function() {
+		return 28 + DefineControl.getNumberSpace();
 	},
 	
 	_getTextLength: function() {

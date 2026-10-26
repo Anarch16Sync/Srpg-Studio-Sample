@@ -197,10 +197,11 @@ var BaseScrollbar = defineObject(BaseObject,
 		var pic = textui.getUIImage();
 		var width = TitleRenderer.getTitlePartsWidth();
 		var height = TitleRenderer.getTitlePartsHeight();
+		var obj = this._getDescriptionLinePos();
 		
 		if (pic !== null) {
-			count = Math.floor(this.getScrollbarWidth() / width) - 1;
-			TitleRenderer.drawTitle(pic, x - 14, y + this._objectHeight - 47, width, height, count);
+			count = Math.floor(this.getScrollbarWidth() / width) + obj.count;
+			TitleRenderer.drawTitle(pic, x + obj.x, y + this._objectHeight + obj.y, width, height, count);
 		}
 	},
 	
@@ -622,6 +623,14 @@ var BaseScrollbar = defineObject(BaseObject,
 	
 	_isScrollbarObjectPressed: function() {
 		return MouseControl.isScrollbarObjectPressed(this);
+	},
+	
+	_getDescriptionLinePos: function() {
+		return {
+			count: -1,
+			x: -14,	
+			y: -47
+		};
 	}
 }
 );

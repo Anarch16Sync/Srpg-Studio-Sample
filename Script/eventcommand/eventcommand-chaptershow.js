@@ -206,9 +206,19 @@ var ChapterShowEventCommand = defineObject(BaseEventCommand,
 	},
 	
 	_getBasePos: function() {
+		var pic;
 		var x = LayoutControl.getCenterX(-1, UIFormat.SCREENFRAME_WIDTH);
 		var y = LayoutControl.getCenterY(-1, UIFormat.SCREENFRAME_HEIGHT);
-		
+		var textui = this._getTextUI();
+
+		if (textui !== null) {
+			pic = textui.getUIImage();
+			if (pic !== null) {
+				x = LayoutControl.getCenterX(-1, pic.getWidth());
+				y = LayoutControl.getCenterY(-1, pic.getHeight());
+			}
+		}
+
 		return createPos(x, y);
 	},
 	

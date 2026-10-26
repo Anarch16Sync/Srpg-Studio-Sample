@@ -96,8 +96,12 @@ var DamageCalculator = {
 		def = this.calculateDefense(active, passive, weapon, isCritical, passiveTotalStatus, trueHitValue);
 		
 		damage = pow - def;
-		if (this.isHalveAttack(active, passive, weapon, isCritical, trueHitValue)) {
-			if (!this.isHalveAttackBreak(active, passive, weapon, isCritical, trueHitValue)) {
+		
+		if (this.isHalved(active, passive, weapon, isCritical, trueHitValue)) {
+			if (this.isPowerHalved()) {
+				damage = Math.floor(pow / 2) - def;
+			}
+			else {
 				damage = Math.floor(damage / 2);
 			}
 		}
@@ -146,6 +150,22 @@ var DamageCalculator = {
 		}
 		
 		return damage;
+	},
+	
+	isHalved: function(active, passive, weapon, isCritical, trueHitValue) {
+		var result = false;
+		
+		if (this.isHalveAttack(active, passive, weapon, isCritical, trueHitValue)) {
+			if (!this.isHalveAttackBreak(active, passive, weapon, isCritical, trueHitValue)) {
+				result = true;
+			}
+		}
+		
+		return result;
+	},
+	
+	isPowerHalved: function() {
+		return false;
 	},
 	
 	isCritical: function(active, passive, weapon, isCritical, trueHitValue) {

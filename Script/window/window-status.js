@@ -71,15 +71,13 @@ var StatusScrollbar = defineObject(BaseScrollbar,
 	drawScrollContent: function(x, y, object, isSelect, index) {
 		var statusEntry = object;
 		var n = statusEntry.param;
-		var text = statusEntry.type;
-		var textui = this.getParentTextUI();
-		var font = textui.getFont();
-		var length = this._getTextLength();
 		
-		TextRenderer.drawKeywordText(x, y, text, length, ColorValue.KEYWORD, font);
+		statusEntry.textui = this.getParentTextUI();
+		
+		this._drawStatusName(x, y, statusEntry, isSelect, index);
+		
 		x += this._getNumberSpace();
 		
-		statusEntry.textui = textui;
 		if (statusEntry.isRenderable) {
 			ParamGroup.drawUnitParameter(x, y, statusEntry, isSelect, statusEntry.index);
 		}
@@ -87,7 +85,7 @@ var StatusScrollbar = defineObject(BaseScrollbar,
 			if (n < 0) {
 				n = 0;
 			}
-			NumberRenderer.drawNumber(x, y, n);
+			NumberRenderer.drawNumber(x + this._getStatusNumberOffsetX(), y, n);
 		}
 		
 		if (statusEntry.bonus !== 0) {
@@ -96,7 +94,7 @@ var StatusScrollbar = defineObject(BaseScrollbar,
 	},
 	
 	getObjectWidth: function() {
-		var width = 100;
+		var width = this._getBaseWidth();
 		
 		if (this._isBonus) {
 			width += 24;
@@ -172,6 +170,14 @@ var StatusScrollbar = defineObject(BaseScrollbar,
 		return ParamGroup.isParameterDisplayable(UnitStatusType.NORMAL, index);
 	},
 	
+	_drawStatusName: function(x, y, statusEntry, isSelect, index) {
+		var text = statusEntry.type;
+		var font = statusEntry.textui.getFont();
+		var length = this._getTextLength();
+		
+		TextRenderer.drawKeywordText(x, y, text, length, ColorValue.KEYWORD, font);
+	},
+	
 	_drawBonus: function(x, y, statusEntry) {
 		var n = statusEntry.bonus;
 		
@@ -215,6 +221,14 @@ var StatusScrollbar = defineObject(BaseScrollbar,
 	
 	_getNumberSpace: function() {
 		return 70;
+	},
+	
+	_getBaseWidth: function() {
+		return 100;
+	},
+	
+	_getStatusNumberOffsetX: function() {
+		return 0;
 	},
 	
 	_getTextLength: function() {

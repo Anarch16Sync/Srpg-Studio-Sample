@@ -328,7 +328,7 @@ var TextCustomEffect = defineObject(BaseCustomEffect,
 		if (this._battleType === BattleType.REAL) {	
 			pos = this._battleObject.getEffectPosFromUnit(null, active);
 			x = pos.x;
-			y = pos.y - 40;
+			y = pos.y + this._getAreaPlusY();
 			
 			width = this._getWidth();
 			max = RealBattleArea.WIDTH;
@@ -352,7 +352,7 @@ var TextCustomEffect = defineObject(BaseCustomEffect,
 			}
 			
 			if (y < Math.floor(root.getGameAreaHeight() / 2)) {
-				y += 98;
+				y += this._getAreaPlusY();
 			}
 			else {
 				y -= this._getHeight(skillArray);
@@ -428,6 +428,10 @@ var TextCustomEffect = defineObject(BaseCustomEffect,
 	
 	_getWidth: function() {
 		return 190;
+	},
+	
+	_getAreaPlusY: function() {
+		return this._battleType === BattleType.REAL ? -40 : 98;
 	},
 	
 	_getAreaSkillPos: function() {

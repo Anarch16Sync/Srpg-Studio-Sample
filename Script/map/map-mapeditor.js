@@ -511,15 +511,19 @@ MapParts.Terrain = defineObject(BaseMapParts,
 	},
 	
 	_drawMain: function(x, y) {
-		var width = this._getWindowWidth();
-		var height = this._getWindowHeight();
 		var xCursor = this.getMapPartsX();
 		var yCursor = this.getMapPartsY();
 		var terrain = PosChecker.getTerrainFromPos(xCursor, yCursor);
 		var textui = this._getWindowTextUI();
 		var pic = textui.getUIImage();
 		
-		WindowRenderer.drawStretchWindow(x, y, width, height, pic);
+		if (terrain === null) {
+			// If the terrain cannot be retrieved, exit before calling drawStretchWindow.
+			// This prevents only the top edge of the window from being rendered.
+			return;
+		}
+		
+		WindowRenderer.drawStretchWindow(x, y, this._getWindowWidth(), this._getWindowHeight(), pic);
 		
 		x += this._getWindowXPadding();
 		y += this._getWindowYPadding();

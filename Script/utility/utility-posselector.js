@@ -12,6 +12,7 @@ var PosSelectorType = {
 
 var PosSelector = defineObject(BaseObject,
 {
+	_unit: null,
 	_posMenu: null,
 	_indexArray: null,
 	_filter: null,

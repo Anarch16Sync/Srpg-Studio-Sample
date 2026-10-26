@@ -541,7 +541,7 @@ var EasyAttackWindow = defineObject(BaseWindow,
 	},
 	
 	_drawHP: function(xBase, yBase) {
-		var balancer, textui, color, font;
+		var balancer, pos, textui, color, font;
 		var x = xBase;
 		var y = yBase;
 		var pic = root.queryUI('battle_gauge');
@@ -554,14 +554,35 @@ var EasyAttackWindow = defineObject(BaseWindow,
 			color = textui.getColor();
 			font = textui.getFont();
 			
-			TextRenderer.drawText(x + 20, y + 33, this._getHpText(), -1, color, font);
-			NumberRenderer.drawAttackNumberColor(x + 70, y + 30, balancer.getCurrentValue(), 1, 255);
-			this._gaugeBar.drawGaugeBar(x + 10, y + 55, pic);
+			pos = this._getHpTextPos();
+			TextRenderer.drawText(x + pos.x, y + pos.y, this._getHpText(), -1, color, font);
+			
+			pos = this._getNumberPos();
+			NumberRenderer.drawAttackNumberColor(x + pos.x, y + pos.y, balancer.getCurrentValue(), 1, 255);
+			
+			pos = this._getGaugePos();
+			this._gaugeBar.drawGaugeBar(x + pos.x, y + pos.y, pic);
 		}
+	},
+	
+	_getHpTextPos: function() {
+		return createPos(20, 33);
+	},
+	
+	_getNumberPos: function() {
+		return createPos(70, 30);
+	},
+	
+	_getGaugePos: function() {
+		return createPos(10, 55);
 	},
 	
 	_getHpText: function() {
 		var text = root.queryCommand('hp_param');
+		
+		if (text === 'HP') {
+			return 'ＨＰ';
+		}
 		
 		return text;
 	}

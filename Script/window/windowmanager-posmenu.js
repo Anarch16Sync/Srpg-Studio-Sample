@@ -208,8 +208,8 @@ var PosBaseWindow = defineObject(BaseWindow,
 		var balancer = this._gaugeBar.getBalancer();
 		
 		if (this._unit !== null) {
-			ContentRenderer.drawHp(x, y + 20, balancer.getCurrentValue(), balancer.getMaxValue());
-			this._gaugeBar.drawGaugeBar(x, y + 40, pic);
+			ContentRenderer.drawHp(x, y + this._getHpMarginY(), balancer.getCurrentValue(), balancer.getMaxValue());
+			this._gaugeBar.drawGaugeBar(x, y + this._getGaugeMarginY(), pic);
 		}
 	},
 	
@@ -222,7 +222,7 @@ var PosBaseWindow = defineObject(BaseWindow,
 		
 		if (item !== null) {
 			x = xBase;
-			y = yBase + 60;
+			y = yBase + this._getItemMarginY();
 			ItemRenderer.drawItem(x, y, item, color, font, false);
 		}
 	},
@@ -234,13 +234,29 @@ var PosBaseWindow = defineObject(BaseWindow,
 		var unit = this._unit;
 		
 		if (unit !== null) {
-			y += 20;
+			y += this._getUnitMarginY();
 			UnitRenderer.drawDefaultUnit(unit, x, y, null);
 		}
 	},
 	
 	getWindowTextUI: function() {
 		return Miscellaneous.getColorWindowTextUI(this._unit);
+	},
+	
+	_getHpMarginY: function() {
+		return 20;
+	},
+	
+	_getGaugeMarginY: function() {
+		return 40;
+	},
+	
+	_getItemMarginY: function() {
+		return 60;
+	},
+	
+	_getUnitMarginY: function() {
+		return 20;
 	},
 	
 	_getTextLength: function() {
@@ -339,12 +355,20 @@ var PosAttackWindow = defineObject(PosBaseWindow,
 	
 	drawInfoBottom: function(xBase, yBase) {
 		var x = xBase;
-		var y = yBase + 90;
+		var y = yBase + this._getStatusMarginY();
 		var textui = this.getWindowTextUI();
 		var color = ColorValue.KEYWORD;
 		var font = textui.getFont();
 		
-		StatusRenderer.drawAttackStatus(x, y, this._statusArray, color, font, 20);
+		StatusRenderer.drawAttackStatus(x, y, this._statusArray, color, font, this._getStatusSpace());
+	},
+	
+	_getStatusMarginY: function() {
+		return 90;
+	},
+	
+	_getStatusSpace: function() {
+		return 20;
 	},
 	
 	_getTitlePartsCount: function() {

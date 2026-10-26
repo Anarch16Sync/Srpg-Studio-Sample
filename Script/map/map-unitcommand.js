@@ -257,7 +257,7 @@ var UnitEventCommandMode = {
 UnitCommand.UnitEvent = defineObject(UnitListCommand,
 {
 	_event: null,
-	_capsuleEvent: null,
+	_mapCommonEvent: null,
 	_questionWindow: null,
 	
 	openCommand: function() {
@@ -605,7 +605,7 @@ UnitCommand.Talk = defineObject(UnitListCommand,
 		return null;
 	},
 	
-	_getTargetEvent : function() {
+	_getTargetEvent: function() {
 		var unit = this.getCommandTarget();
 		var dest = this._posSelector.getSelectorTarget(true);
 		

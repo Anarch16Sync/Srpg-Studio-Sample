@@ -176,21 +176,30 @@ var UnitSortieScreen = defineObject(BaseScreen,
 		}
 	},
 	
+	_getSortiePos: function(pic) {
+		return {
+			picWidth: UIFormat.SCREENFRAME_WIDTH,
+			textY: root.getGameAreaHeight() - 48,
+			picY: root.getGameAreaHeight() - UIFormat.SCREENFRAME_HEIGHT
+		};
+	},
+	
 	_drawSortieText: function(textui) {
 		var text = StringTable.UnitSortie_Max;
 		var color = textui.getColor();
 		var font = textui.getFont();
 		var pic = textui.getUIImage();
-		var x = LayoutControl.getCenterX(-1, UIFormat.SCREENFRAME_WIDTH);
-		var y = root.getGameAreaHeight() - 48;
+		var pos = this._getSortiePos(pic);
+		var x = LayoutControl.getCenterX(-1, pos.picWidth);
+		var y = pos.textY;
 		var textWidth = TextRenderer.getTextWidth(text, font);
 		var space = 25;
 		var memberWidth = 55;
-		var width = UIFormat.SCREENFRAME_WIDTH - textWidth - (memberWidth + space);
+		var width = pos.picWidth - textWidth - (memberWidth + space);
 		var dx = Math.floor(width / 2);
 		
 		if (pic !== null) {
-			pic.draw(x, root.getGameAreaHeight() - UIFormat.SCREENFRAME_HEIGHT);
+			pic.draw(x, pos.picY);
 		}
 		
 		TextRenderer.drawKeywordText(x + dx, y, text, -1, color, font);

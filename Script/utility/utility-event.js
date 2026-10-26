@@ -1,29 +1,27 @@
 
+// This object is used by EventChecker.
+// eventList consists of root.getCurrentSession().getAutoEventList(), root.getCurrentSession().getOpeningEventList(),
+// and root.getCurrentSession().getEndingEventList(), with the exception of root.getCurrentSession().getCommunicationEventList().
+// With the exception of communication events, these are lists that are executed automatically.
 var EventCommonArray = {
 	createArray: function(eventList, eventType) {
-		var i, count, event, list;
+		var i, event, list, count;
 		var firstArray = [];
 		var lastArray = [];
 		var eventArray = [];
 		
-		if (this._isMapCommonDisabled || root.getBaseScene() === SceneType.REST) {
-			count = eventList.getCount();
+		if (this._isMapCommonEnabled()) {
+			list = root.getCurrentSession().getMapCommonEventList();
+			count = list.getCount();
 			for (i = 0; i < count; i++) {
-				eventArray.push(eventList.getData(i));
-			}
-			return eventArray;
-		}
-		
-		list = root.getCurrentSession().getMapCommonEventList();
-		count = list.getCount();
-		for (i = 0; i < count; i++) {
-			event = list.getData(i);
-			if (event.getCommonEventInfo().getEventType() === eventType) {
-				if (event.getCommonEventInfo().isFirst()) {
-					firstArray.push(event);
-				}
-				else {
-					lastArray.push(event);
+				event = list.getData(i);
+				if (event.getCommonEventInfo().getEventType() === eventType) {
+					if (event.getCommonEventInfo().isFirst()) {
+						firstArray.push(event);
+					}
+					else {
+						lastArray.push(event);
+					}
 				}
 			}
 		}
@@ -44,6 +42,10 @@ var EventCommonArray = {
 		}
 		
 		return eventArray;
+	},
+	
+	_isMapCommonEnabled: function() {
+		return root.getBaseScene() !== SceneType.REST;
 	}
 };
 
@@ -52,7 +54,6 @@ var EventChecker = defineObject(BaseObject,
 	_eventArray: null,
 	_capsuleEvent: null,
 	_eventIndex: 0,
-	_isMapCommonDisabled: false,
 	_isAllSkipEnabled: false,
 	
 	enterEventChecker: function(eventList, eventType) {
@@ -82,10 +83,6 @@ var EventChecker = defineObject(BaseObject,
 		}
 		
 		return MoveResult.CONTINUE;
-	},
-	
-	disableMapCommonEvent: function() {
-		this._isMapCommonDisabled = true;
 	},
 	
 	enableAllSkip: function() {

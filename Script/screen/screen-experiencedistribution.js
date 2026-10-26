@@ -573,17 +573,17 @@ var LevelupUnitScrollbar = defineObject(BaseScrollbar,
 	},
 	
 	_drawLevelInfo: function(x, y, object) {
-		var x2 = (x + this.getObjectWidth()) - 56;
+		var x2 = (x + this.getObjectWidth()) + this._getLevelInfoHorzMargin();
 		
 		y += 8;
 		
 		if (this._isLevelDisplayable(object)) {
 			TextRenderer.drawSignText(x2, y, StringTable.Status_Level);
-			NumberRenderer.drawNumber(x2 + 36, y, object.getLv());
+			NumberRenderer.drawNumber(x2 + this._getNumberInterval(), y, object.getLv());
 		}
 		else {
 			TextRenderer.drawSignText(x2, y, StringTable.Status_Experience);
-			NumberRenderer.drawNumber(x2 + 36, y, object.getExp());
+			NumberRenderer.drawNumber(x2 + this._getNumberInterval(), y, object.getExp());
 			
 			if (this._isCursorDisplayable(object)) {
 				this._drawCursor(x2, y);
@@ -600,6 +600,14 @@ var LevelupUnitScrollbar = defineObject(BaseScrollbar,
 		if (pic !== null) {
 			pic.drawParts(x + 38, y - 4, 0, ySrc, width, height);	
 		}
+	},
+	
+	_getNumberInterval: function() {
+		return 36;
+	},
+	
+	_getLevelInfoHorzMargin: function() {
+		return -56;
 	},
 	
 	_getTextLength: function() {

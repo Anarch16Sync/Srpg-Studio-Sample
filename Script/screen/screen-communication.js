@@ -85,6 +85,11 @@ var CommunicationScreen = defineObject(BaseScreen,
 	
 	_rebuildCommunicationEventList: function() {
 		var i, count, data, entry;
+		// It is intentional that this method calls EventCommonArray.createArray rather than directly calling root.getCurrentSession().getCommunicationEventList().
+		// In this case, the display order is established as Map Common Event (First) -> Communication Events for that Map -> Map common Event (Last),
+		// allowing you to create events that appear on the Information screen for any map.
+		// For example, creating an event such as 'Game Guide' as a communication event for every map is time-consuming,
+		// so it is more convenient to create it as a 'Map Common Event (Last)' and have it displayed on all maps.
 		var arr = EventCommonArray.createArray(root.getCurrentSession().getCommunicationEventList(), EventType.COMMUNICATION);
 		var indexPrev = this._scrollbar.getIndex();
 		var countPrev = this._scrollbar.getObjectCount();

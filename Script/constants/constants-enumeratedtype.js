@@ -760,7 +760,8 @@ var SystemSettingsType = {
 	ANIMESOUND: 2,
 	MARKING: 3,
 	MAPGRID: 4,
-	MAPHP: 5
+	MAPHP: 5,
+	MAPSYMBOL: 6
 };
 
 var RestSaveType = {

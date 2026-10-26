@@ -17,7 +17,7 @@ var DiscardManager = defineObject(BaseWindowManager,
 		this._questionWindow.setQuestionMessage(StringTable.StockItem_ItemDiscard);
 		this._infoWindow = createWindowObject(InfoWindow, this);
 		this._item = item;
-		this._isImportance = item.isImportance();
+		this._isImportance = this._checkImportance(item);
 		
 		if (this._isImportance) {
 			this._playOperationBlockSound();
@@ -68,6 +68,10 @@ var DiscardManager = defineObject(BaseWindowManager,
 		}
 		
 		return result;
+	},
+	
+	_checkImportance: function(item) {
+		return item.isImportance();
 	},
 	
 	_playOperationBlockSound: function() {

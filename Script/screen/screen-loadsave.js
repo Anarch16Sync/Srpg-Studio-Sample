@@ -337,7 +337,7 @@ var LoadSaveScrollbar = defineObject(BaseScrollbar,
 		var x = xBase + obj.dx;
 		var y = yBase + obj.dy;
 		
-		// // Prevent the difficulty icons from being hidden in 640×480 thumbnail mode.
+		// Prevent the difficulty icons from being hidden in 640×480 thumbnail mode.
 		if (this.getCol() === 1 && !DataConfig.isHighResolution()) {
 			x -= 34;
 			y -= 2;
